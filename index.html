@@ -732,6 +732,14 @@ function playWrongBuzz(){
 /* ================= とうけい ログ（将来の統計モード用） ================= */
 let statsLog = [];
 let statsLoaded = false;
+/* ストレージ処理が固まっても画面が進むよう、上限時間を設けるヘルパー */
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')), ms))
+  ]);
+}
+
 async function ensureStatsLoaded(){
   if(statsLoaded) return;
   try{
@@ -1214,9 +1222,13 @@ async function finishQuiz(){
   if(cleared){
     progress[key] = Math.min((progress[key]||0) + 1, 10);
   }
-  await saveProgress();
-  await recordStat('kana-'+currentKind, 'SESSION', cleared);
-  await checkAndUnlockBadges();
+  try{
+    await withTimeout((async()=>{
+      await saveProgress();
+      await recordStat('kana-'+currentKind, 'SESSION', cleared);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){}
   showResult(pct, cleared);
 }
 
@@ -1370,9 +1382,13 @@ async function finishIroQuiz(){
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   iroProgress[currentIroMode] = Math.max(iroProgress[currentIroMode]||0, stars);
-  await saveIroProgress();
-  await recordStat('iro', 'SESSION', true);
-  await checkAndUnlockBadges();
+  try{
+    await withTimeout((async()=>{
+      await saveIroProgress();
+      await recordStat('iro', 'SESSION', true);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){}
   showIroResult(stars);
 }
 
@@ -1557,9 +1573,13 @@ async function finishKazuQuiz(){
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   kazuProgress[currentKazuMode] = Math.max(kazuProgress[currentKazuMode]||0, stars);
-  await saveKazuProgress();
-  await recordStat('kazu', 'SESSION', true);
-  await checkAndUnlockBadges();
+  try{
+    await withTimeout((async()=>{
+      await saveKazuProgress();
+      await recordStat('kazu', 'SESSION', true);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){}
   showKazuResult(stars);
 }
 
@@ -1707,9 +1727,13 @@ async function finishKatachiBasic(){
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
-  await saveKatachiProgress();
-  await recordStat('katachi', 'SESSION', true);
-  await checkAndUnlockBadges();
+  try{
+    await withTimeout((async()=>{
+      await saveKatachiProgress();
+      await recordStat('katachi', 'SESSION', true);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){}
   showKatachiResult(stars);
 }
 
@@ -1804,9 +1828,13 @@ async function finishKatachiScene(){
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
-  await saveKatachiProgress();
-  await recordStat('katachi', 'SESSION', true);
-  await checkAndUnlockBadges();
+  try{
+    await withTimeout((async()=>{
+      await saveKatachiProgress();
+      await recordStat('katachi', 'SESSION', true);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){}
   showKatachiResult(stars);
 }
 function retryKatachi(){
