@@ -843,6 +843,7 @@ async function loadBadgeContext(){
 
 async function checkAndUnlockBadges(){
   const {d, unlocked} = await loadBadgeContext();
+  console.log('[badge check] unlocked count before:', Object.keys(unlocked).length, 'progress:', JSON.stringify(d));
   const newlyUnlocked = [];
   BADGE_DEFS.forEach(b=>{
     if(unlocked[b.id] || b.id==='grand_champion') return;
@@ -860,8 +861,10 @@ async function checkAndUnlockBadges(){
     }
   }
   badgesUnlockedCache = unlocked;
+  console.log('[badge check] newly unlocked:', newlyUnlocked.map(b=>b.id));
   if(newlyUnlocked.length > 0){
-    try{ await window.storage.set('badges-unlocked-v1', JSON.stringify(unlocked)); }catch(e){}
+    try{ await window.storage.set('badges-unlocked-v1', JSON.stringify(unlocked)); }
+    catch(e){ console.error('[badge check] failed to save unlocked badges:', e); }
     queueBadgeUnlocks(newlyUnlocked);
   }
   updateCurrentTitleSlot();
@@ -891,8 +894,14 @@ function showNextJajan(){
   overlay.classList.add('show');
   playCorrectChime();
   launchStamp('🎉');
+  // アニメーションが終わってもタップされなければ自動で閉じる（画面をブロックしたままにしない）
+  if(window._jajanAutoCloseTimer) clearTimeout(window._jajanAutoCloseTimer);
+  window._jajanAutoCloseTimer = setTimeout(()=>{
+    if(jajanShowing) closeJajan();
+  }, 3400);
 }
 function closeJajan(){
+  if(window._jajanAutoCloseTimer){ clearTimeout(window._jajanAutoCloseTimer); window._jajanAutoCloseTimer = null; }
   const overlay = document.getElementById('jajan-overlay');
   overlay.classList.add('hidden');
   overlay.classList.remove('show');
@@ -1228,7 +1237,7 @@ async function finishQuiz(){
       await recordStat('kana-'+currentKind, 'SESSION', cleared);
       await checkAndUnlockBadges();
     })(), 3000);
-  }catch(e){}
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
   showResult(pct, cleared);
 }
 
@@ -1388,7 +1397,7 @@ async function finishIroQuiz(){
       await recordStat('iro', 'SESSION', true);
       await checkAndUnlockBadges();
     })(), 3000);
-  }catch(e){}
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
   showIroResult(stars);
 }
 
@@ -1579,7 +1588,7 @@ async function finishKazuQuiz(){
       await recordStat('kazu', 'SESSION', true);
       await checkAndUnlockBadges();
     })(), 3000);
-  }catch(e){}
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
   showKazuResult(stars);
 }
 
@@ -1733,7 +1742,7 @@ async function finishKatachiBasic(){
       await recordStat('katachi', 'SESSION', true);
       await checkAndUnlockBadges();
     })(), 3000);
-  }catch(e){}
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
   showKatachiResult(stars);
 }
 
@@ -1834,7 +1843,7 @@ async function finishKatachiScene(){
       await recordStat('katachi', 'SESSION', true);
       await checkAndUnlockBadges();
     })(), 3000);
-  }catch(e){}
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
   showKatachiResult(stars);
 }
 function retryKatachi(){
