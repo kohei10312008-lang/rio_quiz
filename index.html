@@ -581,6 +581,41 @@ p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
 </div>
 
 <script>
+/* ================= 保存API 互換シム =================
+   window.storage は Claude のアーティファクト画面専用のAPIで、
+   GitHub Pages 等の外部ホスティングでは存在しない。
+   その場合はブラウザ標準の localStorage で同じインターフェースを再現する。 */
+(function(){
+  if (typeof window.storage !== 'undefined') return; // Claude環境ではそのまま使う
+  console.warn('window.storage が見つからないため localStorage で代用します（GitHub等での実行）');
+  window.storage = {
+    async get(key, shared){
+      const raw = localStorage.getItem('gakushu-app:' + key);
+      if (raw === null) throw new Error('Key not found: ' + key);
+      return { key, value: raw, shared: !!shared };
+    },
+    async set(key, value, shared){
+      localStorage.setItem('gakushu-app:' + key, value);
+      return { key, value, shared: !!shared };
+    },
+    async delete(key, shared){
+      const k = 'gakushu-app:' + key;
+      const existed = localStorage.getItem(k) !== null;
+      localStorage.removeItem(k);
+      return { key, deleted: existed, shared: !!shared };
+    },
+    async list(prefix, shared){
+      const keys = [];
+      const p = 'gakushu-app:' + (prefix || '');
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith(p)) keys.push(k.slice('gakushu-app:'.length));
+      }
+      return { keys, prefix, shared: !!shared };
+    }
+  };
+})();
+
 /* ================= データ：ひらがな ================= */
 const HIRA_WORD_MAP = {
   'あ':{w:'あり',e:'🐜'}, 'い':{w:'いぬ',e:'🐶'}, 'う':{w:'うま',e:'🐴'}, 'え':{w:'えんぴつ',e:'✏️'}, 'お':{w:'おに',e:'👹'},
