@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>やってみよう！わくわくランド</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Hiragino Maru Gothic Pro','BIZ UDPGothic',sans-serif;min-height:100vh;background:linear-gradient(160deg,#4DE0FF 0%,#FFDE4D 45%,#FF8FDA 100%);display:flex;align-items:center;justify-content:center;padding:8px;}
+.card{background:#FFFDF6;border-radius:26px;padding:18px 14px;max-width:640px;width:100%;box-shadow:0 10px 40px rgba(43,34,80,0.22);min-height:94vh;display:flex;flex-direction:column;}
+@media (max-width:480px){
+  body{padding:5px;}
+  .card{border-radius:20px;padding:16px 10px;min-height:96vh;}
+}
+#app>div{display:none;flex-direction:column;flex:1;}
+#app>div.show{display:flex;}
+
+/* --- 共通ボタン --- */
+.big-btn{width:100%;border:none;border-radius:22px;padding:18px;font-size:20px;font-weight:900;cursor:pointer;margin-bottom:12px;font-family:inherit;color:#fff;transition:transform .1s;}
+.big-btn:active{transform:scale(.96);}
+.b-yellow{background:linear-gradient(135deg,#FFD93D,#FF9F1C);color:#2B2250;box-shadow:0 5px 0 #E08800;}
+.b-blue{background:linear-gradient(135deg,#6EC6FF,#2E8FCC);box-shadow:0 5px 0 #1F6E9E;}
+.b-green{background:linear-gradient(135deg,#8CD98C,#4CAF50);box-shadow:0 5px 0 #35803A;}
+.b-coral{background:linear-gradient(135deg,#FF9A8B,#FF6F61);box-shadow:0 5px 0 #C8483B;}
+.b-ghost{background:transparent;color:#8AABCC;border:2px solid #D8E6F5;box-shadow:none;font-size:15px;padding:12px;}
+
+/* --- タイトル / サブジェクト画面 --- */
+.mascot{font-size:64px;text-align:center;margin-bottom:6px;animation:idleBounce 2.4s ease-in-out infinite;}
+h1.page-title{font-size:24px;text-align:center;color:#2B2250;margin:4px 0 4px;}
+p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
+.subject-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.subject-btn{border-radius:22px;padding:22px 10px;border:none;cursor:pointer;font-family:inherit;color:#fff;text-align:center;transition:transform .1s;animation:subjectPop .5s cubic-bezier(.17,.67,.35,1.3) both;}
+.subject-grid .subject-btn:nth-child(1){animation-delay:.05s;}
+.subject-grid .subject-btn:nth-child(2){animation-delay:.15s;}
+.subject-grid .subject-btn:nth-child(3){animation-delay:.25s;}
+.subject-grid .subject-btn:nth-child(4){animation-delay:.35s;}
+.subject-grid .subject-btn:nth-child(5){animation-delay:.45s;}
+@keyframes idleBounce{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-8px) rotate(-4deg);}}
+@keyframes subjectPop{0%{transform:scale(0) rotate(-8deg);opacity:0;}60%{transform:scale(1.08) rotate(3deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
+.subject-btn:active{transform:scale(.96);}
+.subject-btn .sb-emoji{font-size:38px;display:block;margin-bottom:6px;}
+.subject-btn .sb-label{font-size:15px;font-weight:900;}
+.subject-btn.soon{background:#E8EDF4!important;color:#A8B4C4;}
+.subject-btn.soon .sb-tag{font-size:10px;display:block;margin-top:2px;}
+
+/* --- 上部バー --- */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.icon-btn{background:#F0F4FF;border:none;border-radius:14px;width:40px;height:40px;font-size:18px;cursor:pointer;flex-shrink:0;}
+.topbar-title{font-weight:900;color:#2B2250;font-size:16px;}
+
+/* --- モード選択 --- */
+.mode-card{border-radius:22px;padding:20px;margin-bottom:12px;cursor:pointer;border:none;width:100%;font-family:inherit;text-align:left;display:flex;align-items:center;gap:16px;color:#fff;transition:transform .1s;}
+.mode-card:active{transform:scale(.97);}
+.mode-icon{font-size:40px;flex-shrink:0;}
+.mode-card h3{font-size:17px;font-weight:900;}
+.mode-card p{font-size:12px;opacity:.9;margin-top:2px;}
+
+/* --- 五十音表 --- */
+.table-wrap{flex:1;display:flex;flex-direction:column;}
+.gojuon-table{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-bottom:10px;}
+.gj-cell{aspect-ratio:1;border-radius:9px;border:2px solid #D0E4F5;background:#F5FAFF;font-size:15px;font-weight:900;color:#2B2250;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.gj-cell:active{transform:scale(.9);background:#E8FFF4;border-color:#4CAF82;}
+.gj-cell.empty{border:none;background:transparent;cursor:default;}
+.gj-cell.n-cell{background:#FFF3D6;border-color:#FFC93C;}
+.table-word-box{background:linear-gradient(135deg,#2B2250,#463A82);border-radius:18px;padding:14px;text-align:center;min-height:70px;display:flex;align-items:center;justify-content:center;gap:12px;color:#fff;}
+.table-word-box .tw-emoji{font-size:36px;}
+.table-word-box .tw-text{text-align:left;}
+.table-word-box .tw-char{font-size:22px;font-weight:900;}
+.table-word-box .tw-word{font-size:13px;color:#C8BEEC;}
+.table-word-box.empty-state{color:#B8AEDD;font-size:13px;}
+
+/* --- レベル選択 --- */
+.level-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.level-btn{border-radius:20px;padding:16px 18px;border:none;cursor:pointer;font-family:inherit;text-align:left;display:flex;align-items:center;justify-content:space-between;background:#F0F7FF;border:2.5px solid #D0E4F5;transition:transform .1s;}
+.level-btn:active{transform:scale(.97);}
+.level-btn.done{background:#EAFBEA;border-color:#8CD98C;}
+.level-btn .lv-name{font-size:16px;font-weight:900;color:#2B2250;}
+.level-btn .lv-desc{font-size:11px;color:#7A8AA8;margin-top:2px;}
+.level-btn .lv-stars{font-size:16px;color:#FFC93C;}
+.level-btn.locked{opacity:.5;}
+
+/* --- クイズ共通 --- */
+.progress-bar-bg{background:#E6EEF7;border-radius:8px;height:10px;overflow:hidden;margin-bottom:14px;}
+.progress-bar{height:100%;border-radius:8px;background:linear-gradient(90deg,#6EC6FF,#4CAF82);transition:width .3s;}
+.quiz-question{background:linear-gradient(135deg,#FF9A8B,#FF6F61);border-radius:20px;padding:22px;text-align:center;margin-bottom:16px;color:#fff;}
+.quiz-speaker-btn{background:rgba(255,255,255,.25);border:none;border-radius:50%;width:64px;height:64px;font-size:30px;cursor:pointer;margin-bottom:8px;}
+.quiz-question p{font-size:14px;font-weight:700;}
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;flex:1;align-content:start;}
+.opt-btn{border-radius:20px;padding:20px 8px;font-size:42px;font-weight:900;cursor:pointer;border:3px solid #D0E4F5;background:#fff;color:#2B2250;font-family:inherit;transition:all .15s;}
+.opt-btn.word-opt{font-size:20px;padding:18px 8px;}
+.opt-btn:active{transform:scale(.95);}
+.opt-btn.correct{background:#E8FFF4;border-color:#4CAF82;}
+.opt-btn.wrong{background:#FFF0F0;border-color:#FF6B6B;}
+.feedback{text-align:center;font-size:18px;font-weight:900;min-height:28px;margin-top:10px;}
+.feedback.correct{color:#4CAF82;}
+.feedback.wrong{color:#FF6B6B;}
+
+/* --- 結果 --- */
+.result-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.result-emoji{font-size:74px;margin-bottom:6px;}
+.result-title{font-size:22px;font-weight:900;color:#2B2250;margin-bottom:14px;}
+.stars-row{font-size:38px;margin-bottom:20px;letter-spacing:6px;}
+
+/* --- いろクイズ --- */
+.color-swatch-big{width:130px;height:130px;border-radius:26px;margin:0 auto 10px;box-shadow:0 6px 0 rgba(0,0,0,.12);border:4px solid rgba(255,255,255,.7);}
+.iro-question-text{text-align:center;font-size:15px;font-weight:700;color:#2B2250;}
+.opt-color{aspect-ratio:1;border-radius:22px;border:4px solid #E4EDF7;cursor:pointer;transition:all .15s;}
+.opt-color:active{transform:scale(.95);}
+.opt-color.correct{border-color:#4CAF82;box-shadow:0 0 0 4px rgba(76,175,130,.4);}
+.opt-color.wrong{border-color:#FF6B6B;box-shadow:0 0 0 4px rgba(255,107,107,.4);}
+.mode-substars{font-size:12px;color:#FFE9A8;margin-top:4px;}
+
+/* --- かず --- */
+.obj-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:230px;margin:6px auto;}
+.obj-grid span{font-size:26px;line-height:1;}
+.add-row{display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0;}
+.add-sym{font-size:26px;font-weight:900;color:#fff;}
+.suji-table{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;}
+.suji-cell{border-radius:16px;border:2.5px solid #D0E4F5;background:#F5FAFF;padding:12px 4px;text-align:center;cursor:pointer;transition:all .12s;}
+.suji-cell:active{transform:scale(.92);background:#E8FFF4;border-color:#4CAF82;}
+.suji-cell .sc-num{font-size:30px;font-weight:900;color:#2B2250;display:block;}
+.suji-cell .sc-yomi{font-size:11px;color:#7A8AA8;}
+
+/* --- かたち --- */
+.shape-el{display:inline-block;}
+.shape-circle{border-radius:50%;}
+.shape-oval{border-radius:50%;}
+.shape-square{border-radius:8px;}
+.shape-rectangle{border-radius:8px;}
+.shape-triangle{clip-path:polygon(50% 0%, 0% 100%, 100% 100%);}
+.shape-rhombus{clip-path:polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);}
+.shape-pentagon{clip-path:polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);}
+.shape-hexagon{clip-path:polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);}
+.shape-trapezoid{clip-path:polygon(22% 0%, 78% 0%, 100% 100%, 0% 100%);}
+.shape-star{clip-path:polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);}
+.shape-stage{display:flex;align-items:center;justify-content:center;min-height:110px;margin-bottom:6px;}
+.opt-shape{aspect-ratio:1;border-radius:20px;border:4px solid #E4EDF7;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;background:#fff;}
+.opt-shape:active{transform:scale(.95);}
+.opt-shape.correct{border-color:#4CAF82;box-shadow:0 0 0 4px rgba(76,175,130,.4);}
+.opt-shape.wrong{border-color:#FF6B6B;box-shadow:0 0 0 4px rgba(255,107,107,.4);}
+.scene-instruction{background:linear-gradient(135deg,#B06EF5,#7C3AED);border-radius:20px;padding:16px;text-align:center;margin-bottom:12px;color:#fff;}
+.scene-instruction .si-sample{margin-bottom:6px;}
+.scene-instruction p{font-size:14px;font-weight:700;}
+.scene-remaining{font-size:12px;color:#D0C0FF;margin-top:4px;}
+.scene-field{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;align-content:flex-start;background:#F5F8FC;border-radius:18px;padding:14px;flex:1;min-height:200px;}
+.scene-item{cursor:pointer;transition:transform .12s, opacity .2s;display:flex;align-items:center;justify-content:center;}
+.scene-item:active{transform:scale(.9);}
+.scene-item.found{opacity:.25;pointer-events:none;}
+.scene-item.wrong-flash{filter:drop-shadow(0 0 0 4px #FF6B6B);}
+
+/* --- オープニング スプラッシュ --- */
+.splash-screen{position:fixed;inset:0;z-index:9999;background:linear-gradient(160deg,#4DE0FF 0%,#FFDE4D 45%,#FF8FDA 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;}
+.splash-screen.fade-out{animation:splashFadeOut .4s ease forwards;}
+.splash-inner{position:relative;z-index:2;text-align:center;padding:24px;}
+.splash-logo{font-size:84px;line-height:1;animation:splashBounce .8s ease-out both;}
+.splash-title{font-size:23px;font-weight:900;color:#2B2250;text-shadow:2px 3px 0 rgba(255,255,255,.6);margin:8px 0 4px;letter-spacing:1px;animation:splashFadeUp .6s .3s ease-out both;}
+.splash-sub{font-size:13px;font-weight:700;color:#5A3E96;margin-bottom:16px;animation:splashFadeUp .6s .45s ease-out both;}
+.splash-modes{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:22px;animation:splashFadeUp .6s .6s ease-out both;}
+.sp-mode{background:rgba(255,255,255,.88);border-radius:14px;padding:8px 11px;font-size:20px;font-weight:900;color:#2B2250;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 3px 10px rgba(0,0,0,.1);}
+.sp-mode span{font-size:10px;color:#7A5AA8;font-weight:700;}
+.splash-countdown{animation:splashFadeUp .6s .9s ease-out both;}
+.splash-count-num{font-size:46px;font-weight:900;color:#2B2250;text-shadow:2px 3px 0 rgba(255,255,255,.7);line-height:1;}
+.splash-skip-hint{font-size:12px;color:#5A3E96;font-weight:700;margin-top:6px;}
+.splash-bubble{position:absolute;border-radius:50%;opacity:.55;pointer-events:none;animation:splashFloat linear infinite;display:flex;align-items:center;justify-content:center;}
+@keyframes splashBounce{0%{transform:scale(0) rotate(-20deg);opacity:0}60%{transform:scale(1.2) rotate(5deg);opacity:1}100%{transform:scale(1) rotate(0deg);opacity:1}}
+@keyframes splashFadeUp{0%{transform:translateY(20px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes splashFloat{0%{transform:translateY(0) rotate(0deg)}100%{transform:translateY(-110vh) rotate(360deg)}}
+@keyframes splashCountPop{0%{transform:scale(1.5);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes splashFadeOut{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}
+
+/* --- サブジェクト画面 上部ボタン --- */
+.top-pill-row{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.top-pill{background:rgba(255,255,255,.85);border:none;border-radius:20px;padding:7px 14px;font-size:12px;font-weight:900;color:#2B2250;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.08);font-family:inherit;}
+.current-title-pill{display:block;text-align:center;background:linear-gradient(90deg,#F5C542,#B8860B);color:#fff;border-radius:16px;padding:6px 12px;font-size:12px;font-weight:900;margin:0 auto 10px;width:fit-content;box-shadow:0 3px 10px rgba(184,134,11,.3);}
+
+/* --- バッジ画面 --- */
+.badge-progress-bar{font-size:13px;font-weight:700;color:#F97316;margin-bottom:10px;text-align:center;background:#FFF7E0;border-radius:12px;padding:8px;}
+.badge-tabs{display:flex;gap:6px;margin-bottom:10px;}
+.badge-tab{flex:1;padding:7px 4px;border-radius:12px;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;background:#E0E8F5;color:#5A7A9F;}
+.badge-tab.active{background:#2B2250;color:#fff;}
+.badge-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;overflow-y:auto;flex:1;padding-bottom:6px;}
+.badge-card{border-radius:16px;padding:10px 8px;text-align:center;border:2px solid #E0E4EA;background:#F0F2F5;position:relative;cursor:pointer;transition:transform .1s;}
+.badge-card:active{transform:scale(.95);}
+.badge-new-badge{position:absolute;top:-6px;right:-6px;background:#FF3B30;color:#fff;font-size:9px;font-weight:900;padding:3px 7px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.25);z-index:2;animation:idleBounce 1.6s ease-in-out infinite;}
+.badge-card.unlocked.rarity-common{background:linear-gradient(135deg,#FFF7E0,#FFEFC0);border-color:#CD7F32;}
+.badge-card.unlocked.rarity-rare{background:linear-gradient(135deg,#EEF4FF,#D0E4FF);border-color:#7CB9E8;}
+.badge-card.unlocked.rarity-epic{background:linear-gradient(135deg,#FFF0F8,#FFD6F0);border-color:#D966B0;}
+.badge-card.unlocked.rarity-title{background:linear-gradient(135deg,#FFF9E6,#FCE8A8);border-color:#B8860B;box-shadow:0 0 0 2px #F5C542 inset;}
+.badge-card .bc-emoji{font-size:30px;margin-bottom:2px;filter:grayscale(0);}
+.badge-card.locked .bc-emoji{filter:grayscale(1);opacity:.35;}
+.badge-card .bc-name{font-size:11px;font-weight:900;color:#2B2250;line-height:1.3;}
+.badge-card.locked .bc-name{color:#A8B0BC;}
+.badge-card .bc-desc{font-size:9px;color:#7A8AA8;margin-top:2px;line-height:1.3;}
+
+/* --- バッジ詳細モーダル --- */
+#badge-detail-modal{position:fixed;inset:0;background:rgba(43,34,80,.55);z-index:1200;display:flex;align-items:center;justify-content:center;padding:20px;}
+#badge-detail-modal.hidden{display:none;}
+.badge-detail-card{background:#FFFDF6;border-radius:24px;padding:26px 22px;text-align:center;max-width:300px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25);}
+.bdm-emoji{font-size:70px;margin-bottom:8px;}
+.bdm-rarity{font-size:12px;font-weight:900;color:#B8860B;margin-bottom:6px;}
+.bdm-name{font-size:19px;font-weight:900;color:#2B2250;margin-bottom:6px;}
+.bdm-desc{font-size:13px;color:#5A7A9F;line-height:1.6;margin-bottom:8px;}
+.bdm-date{font-size:11px;color:#AABCCC;margin-bottom:16px;}
+
+/* --- とうけい 詳細サブ行 --- */
+.stat-subject-block{margin-bottom:16px;}
+.stat-sub-row{margin:6px 0 6px 14px;}
+.stat-sub-row .ssub-label{font-size:11px;color:#7A8AA8;font-weight:700;margin-bottom:2px;display:flex;justify-content:space-between;}
+.stat-bar-bg-sm{background:#E6EEF7;border-radius:6px;height:9px;overflow:hidden;}
+.stat-bar-fill-sm{height:100%;border-radius:6px;background:linear-gradient(90deg,#B06EF5,#6EC6FF);transition:width .4s;}
+
+/* --- ジャジャーン --- */
+#jajan-overlay{position:fixed;inset:0;z-index:1100;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:linear-gradient(160deg,#463A82,#2B2250);}
+#jajan-overlay.hidden{display:none;}
+#jajan-overlay.show{animation:jajanBg 3.2s ease forwards;}
+#jajan-rays{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;animation:jajanRays 2.5s ease .1s both;}
+#jajan-rays-inner{width:600px;height:600px;background:conic-gradient(transparent 0deg,rgba(255,255,255,.18) 10deg,transparent 20deg,rgba(255,255,255,.12) 30deg,transparent 40deg,rgba(255,255,255,.18) 50deg,transparent 60deg,rgba(255,255,255,.12) 70deg,transparent 80deg,rgba(255,255,255,.18) 90deg,transparent 100deg,rgba(255,255,255,.12) 110deg,transparent 120deg,rgba(255,255,255,.18) 130deg,transparent 140deg,rgba(255,255,255,.12) 150deg,transparent 160deg,rgba(255,255,255,.18) 170deg,transparent 180deg,rgba(255,255,255,.12) 190deg,transparent 200deg,rgba(255,255,255,.18) 210deg,transparent 220deg,rgba(255,255,255,.12) 230deg,transparent 240deg,rgba(255,255,255,.18) 250deg,transparent 260deg,rgba(255,255,255,.12) 270deg,transparent 280deg,rgba(255,255,255,.18) 290deg,transparent 300deg,rgba(255,255,255,.12) 310deg,transparent 320deg,rgba(255,255,255,.18) 330deg,transparent 340deg,rgba(255,255,255,.12) 350deg,transparent 360deg);border-radius:50%;}
+#jajan-rarity-tag{font-size:13px;font-weight:900;color:#fff;letter-spacing:2px;margin-bottom:10px;text-shadow:0 2px 8px rgba(0,0,0,.3);animation:jajanText .5s ease .3s both;}
+#jajan-badge-wrap{font-size:100px;line-height:1;margin-bottom:14px;filter:drop-shadow(0 6px 24px rgba(0,0,0,.35));animation:jajanBadge .7s cubic-bezier(.17,.67,.35,1.3) .15s both;}
+#jajan-text-wrap{text-align:center;animation:jajanText .5s ease .4s both;}
+#jajan-title{font-size:24px;font-weight:900;color:#fff;text-shadow:0 3px 12px rgba(0,0,0,.4);margin-bottom:6px;}
+#jajan-desc{font-size:13px;color:rgba(255,255,255,.85);font-weight:700;max-width:260px;margin:0 auto;}
+#jajan-hint{position:absolute;bottom:36px;font-size:12px;color:rgba(255,255,255,.6);font-weight:700;}
+@keyframes jajanBg{0%{opacity:0}10%{opacity:1}85%{opacity:1}100%{opacity:0}}
+@keyframes jajanBadge{0%{transform:scale(0) rotate(-15deg);opacity:0}30%{transform:scale(1.3) rotate(5deg);opacity:1}50%{transform:scale(.95) rotate(-2deg)}65%{transform:scale(1.08)}80%{transform:scale(1)}100%{transform:scale(1);opacity:1}}
+@keyframes jajanText{0%{transform:translateY(30px);opacity:0}30%{transform:translateY(-6px);opacity:1}45%{transform:translateY(2px)}60%{transform:translateY(0)}100%{opacity:1}}
+@keyframes jajanRays{0%{transform:rotate(0deg) scale(0);opacity:0}20%{opacity:.35;transform:rotate(20deg) scale(1.2)}80%{opacity:.2}100%{opacity:0;transform:rotate(60deg) scale(1.5)}}
+
+/* --- とうけい画面 --- */
+.stat-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:#F0F7FF;border-radius:18px;padding:14px 10px;text-align:center;}
+.stat-card .stc-num{font-size:26px;font-weight:900;color:#2B2250;}
+.stat-card .stc-label{font-size:11px;color:#7A8AA8;font-weight:700;margin-top:2px;}
+.stat-subject-row{margin-bottom:10px;}
+.stat-subject-row .ssr-label{font-size:12px;font-weight:900;color:#2B2250;margin-bottom:3px;display:flex;justify-content:space-between;}
+.stat-bar-bg{background:#E6EEF7;border-radius:8px;height:14px;overflow:hidden;}
+.stat-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#6EC6FF,#4CAF82);transition:width .4s;}
+.stat-empty{text-align:center;color:#B0BCCB;font-size:13px;padding:20px;}
+
+#stamp-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
+.stamp{position:absolute;font-size:44px;animation:stampFly 1s ease-out forwards;}
+@keyframes stampFly{0%{transform:translateY(0) scale(.4) rotate(0);opacity:1;}60%{transform:translateY(-140px) scale(1.3) rotate(15deg);opacity:1;}100%{transform:translateY(-220px) scale(1) rotate(-10deg);opacity:0;}}
+</style>
+</head>
+<body>
+<div id="screen-splash" class="splash-screen" onclick="skipSplash()">
+  <div class="splash-bubbles" id="splash-bubbles"></div>
+  <div class="splash-inner">
+    <div class="splash-logo">🐥</div>
+    <h1 class="splash-title">やってみよう！わくわくランド</h1>
+    <p class="splash-sub">ひらがな・カタカナ・いろ・かず・かたち</p>
+    <div class="splash-modes">
+      <div class="sp-mode">あ<span>ひらがな</span></div>
+      <div class="sp-mode">ア<span>カタカナ</span></div>
+      <div class="sp-mode">🎨<span>いろ</span></div>
+      <div class="sp-mode">🔢<span>かず</span></div>
+      <div class="sp-mode">🔺<span>かたち</span></div>
+    </div>
+    <div class="splash-countdown">
+      <div class="splash-count-num" id="splash-count-num">3</div>
+      <p class="splash-skip-hint">タップで はじめる</p>
+    </div>
+  </div>
+</div>
+<div id="jajan-overlay" class="hidden" onclick="closeJajan()">
+  <div id="jajan-rays"><div id="jajan-rays-inner"></div></div>
+  <div id="jajan-rarity-tag"></div>
+  <div id="jajan-badge-wrap"><span id="jajan-emoji">🏅</span></div>
+  <div id="jajan-text-wrap">
+    <p id="jajan-title"></p>
+    <p id="jajan-desc"></p>
+  </div>
+  <p id="jajan-hint">タップして とじる</p>
+</div>
+<div id="stamp-container"></div>
+<div id="badge-detail-modal" class="hidden" onclick="if(event.target===this) closeBadgeDetail()">
+  <div class="badge-detail-card">
+    <div class="bdm-emoji" id="bdm-emoji">🏅</div>
+    <div class="bdm-rarity" id="bdm-rarity"></div>
+    <div class="bdm-name" id="bdm-name"></div>
+    <div class="bdm-desc" id="bdm-desc"></div>
+    <div class="bdm-date" id="bdm-date"></div>
+    <button class="big-btn b-blue" onclick="closeBadgeDetail()">とじる</button>
+  </div>
+</div>
+<div class="card">
+  <div id="app">
+
+    <!-- 教科選択 -->
+    <div id="screen-subject" class="show">
+      <div class="mascot">🐥</div>
+      <h1 class="page-title">わくわくランド</h1>
+      <div id="current-title-slot"></div>
+      <div class="top-pill-row">
+        <button class="top-pill" onclick="openBadges()">🏅 バッジ・しょうごう</button>
+        <button class="top-pill" onclick="openStats()">📊 きろく</button>
+      </div>
+      <p class="sub">なにを べんきょうする？</p>
+      <div class="subject-grid">
+        <button class="subject-btn b-blue" onclick="openKind('hiragana')">
+          <span class="sb-emoji">あ</span><span class="sb-label">ひらがな</span>
+        </button>
+        <button class="subject-btn b-coral" onclick="openKind('katakana')">
+          <span class="sb-emoji">ア</span><span class="sb-label">カタカナ</span>
+        </button>
+        <button class="subject-btn b-yellow" style="color:#2B2250;" onclick="openIro()">
+          <span class="sb-emoji">🎨</span><span class="sb-label">いろ</span>
+        </button>
+        <button class="subject-btn b-green" onclick="openKazu()">
+          <span class="sb-emoji">🔢</span><span class="sb-label">かず</span>
+        </button>
+        <button class="subject-btn b-blue" style="background:linear-gradient(135deg,#B06EF5,#7C3AED);" onclick="openKatachi()">
+          <span class="sb-emoji">🔺</span><span class="sb-label">かたち</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- バッジ・しょうごう画面 -->
+    <div id="screen-badges">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">🏅 バッジ・しょうごう</div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="badge-progress-bar" id="badges-progress-text">0 / 50 こ かくとく</div>
+      <div class="badge-tabs">
+        <button class="badge-tab active" id="badge-tab-all" onclick="setBadgeTab('all')">すべて</button>
+        <button class="badge-tab" id="badge-tab-unlocked" onclick="setBadgeTab('unlocked')">かくとくずみ</button>
+        <button class="badge-tab" id="badge-tab-locked" onclick="setBadgeTab('locked')">みかくとく</button>
+      </div>
+      <div class="badge-list" id="badge-list"></div>
+    </div>
+
+    <!-- きろく（とうけい）画面 -->
+    <div id="screen-stats">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">📊 きろく</div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="stat-cards" id="stats-cards"></div>
+      <div id="stats-subjects"></div>
+    </div>
+
+    <!-- かな ホーム（モード選択：ひらがな／カタカナ共通） -->
+    <div id="screen-kana-home">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title" id="kana-home-title">ひらがな</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="mode-card b-blue" onclick="openTable()">
+        <div class="mode-icon">📋</div>
+        <div><h3 id="table-mode-title">50おんひょうを みる</h3><p>もじを タップすると こえが きこえるよ</p></div>
+      </button>
+      <button class="mode-card b-coral" onclick="showScreen('screen-level-select')">
+        <div class="mode-icon">👂</div>
+        <div><h3>みみで きく クイズ</h3><p>だんだん むずかしく なるよ</p></div>
+      </button>
+      <button class="big-btn b-ghost" onclick="resetProgress()">きろくを けす</button>
+    </div>
+
+    <!-- 五十音表 -->
+    <div id="screen-table">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-kana-home')">←</button>
+        <div class="topbar-title" id="table-title">50おんひょう</div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="table-wrap">
+        <div class="gojuon-table" id="gojuon-table"></div>
+        <div class="table-word-box empty-state" id="table-word-box">もじを タップしてみてね</div>
+      </div>
+    </div>
+
+    <!-- レベル選択 -->
+    <div id="screen-level-select">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-kana-home')">←</button>
+        <div class="topbar-title">みみで きく クイズ</div>
+        <div style="width:40px;"></div>
+      </div>
+      <p class="sub" style="margin-bottom:14px;">レベル１から じゅんばんに チャレンジ！</p>
+      <div class="level-grid" id="level-grid"></div>
+    </div>
+
+    <!-- クイズ画面 -->
+    <div id="screen-quiz">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-level-select')">←</button>
+        <div class="topbar-title" id="quiz-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="quiz-bar" style="width:0%"></div></div>
+      <div class="quiz-question">
+        <button class="quiz-speaker-btn" id="quiz-speaker" onclick="playQuizSound()">🔊</button>
+        <p id="quiz-instruction">きこえた もじは どれかな？</p>
+      </div>
+      <div class="opt-grid" id="quiz-opts"></div>
+      <div class="feedback" id="quiz-feedback"></div>
+    </div>
+
+    <!-- 結果画面 -->
+    <div id="screen-result">
+      <div class="result-wrap">
+        <div class="result-emoji" id="result-emoji">🌟</div>
+        <div class="result-title" id="result-title">よくできました！</div>
+        <div class="stars-row" id="result-stars"></div>
+        <button class="big-btn b-green" onclick="showScreen('screen-level-select')">レベルせんたくへ</button>
+        <button class="big-btn b-blue" onclick="retryLevel()">もういちど</button>
+      </div>
+    </div>
+
+    <!-- いろ ホーム（モード選択） -->
+    <div id="screen-iro-home">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">いろ あてクイズ</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="mode-card b-coral" onclick="startIroQuiz('color2name')">
+        <div class="mode-icon">🎨</div>
+        <div><h3>いろを みて なまえを えらぶ</h3><p>いろが でるよ、なんの いろかな？</p><div class="mode-substars" id="iro-stars-a"></div></div>
+      </button>
+      <button class="mode-card b-blue" onclick="startIroQuiz('name2color')">
+        <div class="mode-icon">👂</div>
+        <div><h3>きいて いろを えらぶ</h3><p>なまえを きいて、いろを タップ</p><div class="mode-substars" id="iro-stars-b"></div></div>
+      </button>
+      <button class="big-btn b-ghost" onclick="resetIroProgress()">きろくを けす</button>
+    </div>
+
+    <!-- いろクイズ画面 -->
+    <div id="screen-iro-quiz">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-iro-home')">←</button>
+        <div class="topbar-title" id="iro-quiz-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="iro-quiz-bar" style="width:0%"></div></div>
+      <div class="quiz-question" id="iro-quiz-question"></div>
+      <div class="opt-grid" id="iro-quiz-opts"></div>
+      <div class="feedback" id="iro-quiz-feedback"></div>
+    </div>
+
+    <!-- いろ結果画面 -->
+    <div id="screen-iro-result">
+      <div class="result-wrap">
+        <div class="result-emoji" id="iro-result-emoji">🌟</div>
+        <div class="result-title" id="iro-result-title">よくできました！</div>
+        <div class="stars-row" id="iro-result-stars"></div>
+        <button class="big-btn b-green" onclick="showScreen('screen-iro-home')">もどる</button>
+        <button class="big-btn b-blue" onclick="startIroQuiz(currentIroMode)">もういちど</button>
+      </div>
+    </div>
+
+    <!-- かず ホーム -->
+    <div id="screen-kazu-home">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">かず</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="mode-card b-blue" onclick="openKazuTable()">
+        <div class="mode-icon">📋</div>
+        <div><h3>すうじの ひょうを みる</h3><p>タップすると よみかたが きこえるよ</p></div>
+      </button>
+      <button class="mode-card b-coral" onclick="startKazuQuiz('read')">
+        <div class="mode-icon">👂</div>
+        <div><h3>きいて すうじを えらぶ</h3><p>おとを きいて すうじを タップ<span class="mode-substars" id="kazu-stars-read"></span></p></div>
+      </button>
+      <button class="mode-card b-green" onclick="startKazuQuiz('count')">
+        <div class="mode-icon">🔢</div>
+        <div><h3>かぞえて みよう</h3><p>いくつ あるか かぞえよう<span class="mode-substars" id="kazu-stars-count"></span></p></div>
+      </button>
+      <button class="mode-card b-yellow" style="color:#2B2250;" onclick="startKazuQuiz('add')">
+        <div class="mode-icon">➕</div>
+        <div><h3>たしざん</h3><p>あわせて いくつに なるかな<span class="mode-substars" id="kazu-stars-add"></span></p></div>
+      </button>
+      <button class="big-btn b-ghost" onclick="resetKazuProgress()">きろくを けす</button>
+    </div>
+
+    <!-- すうじ ひょう -->
+    <div id="screen-kazu-table">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-kazu-home')">←</button>
+        <div class="topbar-title">すうじの ひょう</div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="suji-table" id="suji-table"></div>
+      <div class="table-word-box empty-state" id="suji-word-box">すうじを タップしてみてね</div>
+    </div>
+
+    <!-- かずクイズ（共通：よみ／かぞえ／たしざん） -->
+    <div id="screen-kazu-quiz">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-kazu-home')">←</button>
+        <div class="topbar-title" id="kazu-quiz-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="kazu-quiz-bar" style="width:0%"></div></div>
+      <div class="quiz-question" id="kazu-quiz-question"></div>
+      <div class="opt-grid" id="kazu-quiz-opts"></div>
+      <div class="feedback" id="kazu-quiz-feedback"></div>
+    </div>
+
+    <!-- かず結果 -->
+    <div id="screen-kazu-result">
+      <div class="result-wrap">
+        <div class="result-emoji" id="kazu-result-emoji">🌟</div>
+        <div class="result-title" id="kazu-result-title">よくできました！</div>
+        <div class="stars-row" id="kazu-result-stars"></div>
+        <button class="big-btn b-green" onclick="showScreen('screen-kazu-home')">もどる</button>
+        <button class="big-btn b-blue" onclick="startKazuQuiz(currentKazuMode)">もういちど</button>
+      </div>
+    </div>
+
+    <!-- かたち ホーム -->
+    <div id="screen-katachi-home">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">かたち</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="mode-card" style="background:linear-gradient(135deg,#6EC6FF,#2E8FCC);" onclick="startKatachiBasic('visual2name')">
+        <div class="mode-icon">👀</div>
+        <div><h3>みて なまえを えらぶ</h3><p>この かたちは なにかな？<span class="mode-substars" id="katachi-stars-visual2name"></span></p></div>
+      </button>
+      <button class="mode-card" style="background:linear-gradient(135deg,#FF9A8B,#FF6F61);" onclick="startKatachiBasic('name2visual')">
+        <div class="mode-icon">👂</div>
+        <div><h3>きいて かたちを えらぶ</h3><p>おとを きいて かたちを タップ<span class="mode-substars" id="katachi-stars-name2visual"></span></p></div>
+      </button>
+      <button class="mode-card" style="background:linear-gradient(135deg,#8CD98C,#4CAF50);" onclick="startKatachiScene('audio')">
+        <div class="mode-icon">🔍</div>
+        <div><h3>きいて さがそう</h3><p>おなじ かたちを ぜんぶ みつけよう<span class="mode-substars" id="katachi-stars-audio"></span></p></div>
+      </button>
+      <button class="mode-card" style="background:linear-gradient(135deg,#FFD93D,#FF9F1C);color:#2B2250;" onclick="startKatachiScene('visual')">
+        <div class="mode-icon">🧩</div>
+        <div><h3>みほんと おなじを さがそう</h3><p>みほんと おなじ かたちを ぜんぶ<span class="mode-substars" id="katachi-stars-visual"></span></p></div>
+      </button>
+      <button class="big-btn b-ghost" onclick="resetKatachiProgress()">きろくを けす</button>
+    </div>
+
+    <!-- かたち クイズ（見て／きいて 4択） -->
+    <div id="screen-katachi-quiz">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-katachi-home')">←</button>
+        <div class="topbar-title" id="katachi-quiz-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="katachi-quiz-bar" style="width:0%"></div></div>
+      <div class="quiz-question" id="katachi-quiz-question"></div>
+      <div class="opt-grid" id="katachi-quiz-opts"></div>
+      <div class="feedback" id="katachi-quiz-feedback"></div>
+    </div>
+
+    <!-- かたち シーン探し -->
+    <div id="screen-katachi-scene">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-katachi-home')">←</button>
+        <div class="topbar-title" id="katachi-scene-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="katachi-scene-bar" style="width:0%"></div></div>
+      <div class="scene-instruction" id="katachi-scene-instruction"></div>
+      <div class="scene-field" id="katachi-scene-field"></div>
+      <div class="feedback" id="katachi-scene-feedback"></div>
+    </div>
+
+    <!-- かたち結果 -->
+    <div id="screen-katachi-result">
+      <div class="result-wrap">
+        <div class="result-emoji" id="katachi-result-emoji">🌟</div>
+        <div class="result-title" id="katachi-result-title">よくできました！</div>
+        <div class="stars-row" id="katachi-result-stars"></div>
+        <button class="big-btn b-green" onclick="showScreen('screen-katachi-home')">もどる</button>
+        <button class="big-btn b-blue" onclick="retryKatachi()">もういちど</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ================= データ：ひらがな ================= */
+const HIRA_WORD_MAP = {
+  'あ':{w:'あり',e:'🐜'}, 'い':{w:'いぬ',e:'🐶'}, 'う':{w:'うま',e:'🐴'}, 'え':{w:'えんぴつ',e:'✏️'}, 'お':{w:'おに',e:'👹'},
+  'か':{w:'かに',e:'🦀'}, 'き':{w:'きりん',e:'🦒'}, 'く':{w:'くも',e:'☁️'}, 'け':{w:'けむり',e:'💨'}, 'こ':{w:'こおり',e:'🧊'},
+  'さ':{w:'さかな',e:'🐟'}, 'し':{w:'しか',e:'🦌'}, 'す':{w:'すいか',e:'🍉'}, 'せ':{w:'せみ',e:'🦗'}, 'そ':{w:'そら',e:'🌤️'},
+  'た':{w:'たこ',e:'🐙'}, 'ち':{w:'ちょう',e:'🦋'}, 'つ':{w:'つき',e:'🌙'}, 'て':{w:'てがみ',e:'✉️'}, 'と':{w:'とり',e:'🐦'},
+  'な':{w:'なす',e:'🍆'}, 'に':{w:'にじ',e:'🌈'}, 'ぬ':{w:'ぬいぐるみ',e:'🧸'}, 'ね':{w:'ねこ',e:'🐱'}, 'の':{w:'のり',e:'🍙'},
+  'は':{w:'はな',e:'🌸'}, 'ひ':{w:'ひこうき',e:'✈️'}, 'ふ':{w:'ふうせん',e:'🎈'}, 'へ':{w:'へび',e:'🐍'}, 'ほ':{w:'ほし',e:'⭐'},
+  'ま':{w:'まめ',e:'🫘'}, 'み':{w:'みかん',e:'🍊'}, 'む':{w:'むし',e:'🐛'}, 'め':{w:'めがね',e:'👓'}, 'も':{w:'もも',e:'🍑'},
+  'や':{w:'やま',e:'⛰️'}, 'ゆ':{w:'ゆき',e:'❄️'}, 'よ':{w:'よる',e:'🌃'},
+  'ら':{w:'らいおん',e:'🦁'}, 'り':{w:'りんご',e:'🍎'}, 'る':{w:'るり',e:'💎'}, 'れ':{w:'れもん',e:'🍋'}, 'ろ':{w:'ろうそく',e:'🕯️'},
+  'わ':{w:'わに',e:'🐊'}, 'を':{w:'とくべつな じ',e:'✍️'}, 'ん':{w:'おわりの おと',e:'🔚'}
+};
+const HIRA_LAYOUT = [
+  ['あ','い','う','え','お'], ['か','き','く','け','こ'], ['さ','し','す','せ','そ'],
+  ['た','ち','つ','て','と'], ['な','に','ぬ','ね','の'], ['は','ひ','ふ','へ','ほ'],
+  ['ま','み','む','め','も'], ['や',null,'ゆ',null,'よ'], ['ら','り','る','れ','ろ'],
+  ['わ',null,null,null,'を'], ['ん',null,null,null,null],
+];
+
+/* ================= データ：カタカナ ================= */
+const KATA_WORD_MAP = {
+  'ア':{w:'アイス',e:'🍦'}, 'イ':{w:'イルカ',e:'🐬'}, 'ウ':{w:'ウサギ',e:'🐰'}, 'エ':{w:'エビ',e:'🦐'}, 'オ':{w:'オレンジ',e:'🍊'},
+  'カ':{w:'カメラ',e:'📷'}, 'キ':{w:'キリン',e:'🦒'}, 'ク':{w:'クジラ',e:'🐳'}, 'ケ':{w:'ケーキ',e:'🍰'}, 'コ':{w:'コアラ',e:'🐨'},
+  'サ':{w:'サラダ',e:'🥗'}, 'シ':{w:'シマウマ',e:'🦓'}, 'ス':{w:'スープ',e:'🍲'}, 'セ':{w:'セーター',e:'🧥'}, 'ソ':{w:'ソファ',e:'🛋️'},
+  'タ':{w:'タイヤ',e:'🛞'}, 'チ':{w:'チーズ',e:'🧀'}, 'ツ':{w:'ツナ',e:'🐟'}, 'テ':{w:'テレビ',e:'📺'}, 'ト':{w:'トマト',e:'🍅'},
+  'ナ':{w:'ナイフ',e:'🔪'}, 'ニ':{w:'ニット',e:'🧶'}, 'ヌ':{w:'ヌードル',e:'🍜'}, 'ネ':{w:'ネクタイ',e:'👔'}, 'ノ':{w:'ノート',e:'📓'},
+  'ハ':{w:'ハンバーガー',e:'🍔'}, 'ヒ':{w:'ヒーロー',e:'🦸'}, 'フ':{w:'フルーツ',e:'🍇'}, 'ヘ':{w:'ヘリコプター',e:'🚁'}, 'ホ':{w:'ホットドッグ',e:'🌭'},
+  'マ':{w:'マスク',e:'😷'}, 'ミ':{w:'ミルク',e:'🥛'}, 'ム':{w:'ムービー',e:'🎬'}, 'メ':{w:'メロン',e:'🍈'}, 'モ':{w:'モンスター',e:'👾'},
+  'ヤ':{w:'ヤギ',e:'🐐'}, 'ユ':{w:'ユニコーン',e:'🦄'}, 'ヨ':{w:'ヨット',e:'⛵'},
+  'ラ':{w:'ライオン',e:'🦁'}, 'リ':{w:'リボン',e:'🎀'}, 'ル':{w:'ルビー',e:'💎'}, 'レ':{w:'レモン',e:'🍋'}, 'ロ':{w:'ロボット',e:'🤖'},
+  'ワ':{w:'ワニ',e:'🐊'}, 'ヲ':{w:'とくべつな じ',e:'✍️'}, 'ン':{w:'おわりの おと',e:'🔚'}
+};
+const KATA_LAYOUT = [
+  ['ア','イ','ウ','エ','オ'], ['カ','キ','ク','ケ','コ'], ['サ','シ','ス','セ','ソ'],
+  ['タ','チ','ツ','テ','ト'], ['ナ','ニ','ヌ','ネ','ノ'], ['ハ','ヒ','フ','ヘ','ホ'],
+  ['マ','ミ','ム','メ','モ'], ['ヤ',null,'ユ',null,'ヨ'], ['ラ','リ','ル','レ','ロ'],
+  ['ワ',null,null,null,'ヲ'], ['ン',null,null,null,null],
+];
+
+const KIND_DATA = {
+  hiragana: { title:'ひらがな', wordMap:HIRA_WORD_MAP, layout:HIRA_LAYOUT, storageKey:'hiragana-progress-v2' },
+  katakana: { title:'カタカナ', wordMap:KATA_WORD_MAP, layout:KATA_LAYOUT, storageKey:'katakana-progress-v2' },
+};
+function kindAllChars(kind){
+  return Object.keys(KIND_DATA[kind].wordMap).filter(c=>c!=='を'&&c!=='ヲ'&&c!=='ん'&&c!=='ン');
+}
+function kindWordPool(kind){
+  return Object.values(KIND_DATA[kind].wordMap).map(v=>v.w).filter(w=>w.length>=2 && !w.includes(' '));
+}
+
+/* レベル定義：耳で聞くクイズ */
+const LEVELS = [
+  {id:1, name:'レベル１', desc:'1もじの おとを きく', qCount:10},
+  {id:2, name:'レベル２', desc:'2〜3もじの ことばを きく', wordLen:[2,3], qCount:10},
+  {id:3, name:'レベル３', desc:'4もじいじょうの ことばを きく', wordLen:[4,99], qCount:10},
+];
+
+/* ================= 状態 ================= */
+let currentKind = 'hiragana';
+let progress = {};
+let currentLevel = null;
+let quizList = [], quizIdx = 0, quizCorrectFirstTry = 0, quizWaiting = false;
+
+/* ================= 教科切り替え ================= */
+async function openKind(kind){
+  currentKind = kind;
+  document.getElementById('kana-home-title').textContent = KIND_DATA[kind].title;
+  document.getElementById('table-mode-title').textContent = '50おんひょうを みる';
+  await loadProgress();
+  showScreen('screen-kana-home');
+}
+
+/* ================= 永続化 ================= */
+async function loadProgress(){
+  try{
+    const r = await window.storage.get(KIND_DATA[currentKind].storageKey);
+    progress = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ progress = {}; }
+}
+async function saveProgress(){
+  try{ await window.storage.set(KIND_DATA[currentKind].storageKey, JSON.stringify(progress)); }catch(e){}
+}
+async function resetProgress(){
+  progress = {};
+  await saveProgress();
+  renderLevelGrid();
+}
+
+/* ================= 画面切り替え ================= */
+function showScreen(id){
+  document.querySelectorAll('#app > div').forEach(d=>d.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  if(id==='screen-level-select') renderLevelGrid();
+}
+
+/* ================= 音声 ================= */
+let _jaVoice = null;
+function pickJaVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  const jaVoices = voices.filter(v=>v.lang && v.lang.toLowerCase().startsWith('ja'));
+  if(jaVoices.length===0) return;
+  // 明るい印象の声（女性/子ども向けの名前を優先）を探す
+  const preferred = jaVoices.find(v=>/female|kyoko|o-?ren|haruka|女性/i.test(v.name)) 
+    || jaVoices.find(v=>!/male|otoya|男性/i.test(v.name))
+    || jaVoices[0];
+  _jaVoice = preferred;
+}
+if('speechSynthesis' in window){
+  pickJaVoice();
+  window.speechSynthesis.onvoiceschanged = pickJaVoice;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'ja-JP';
+  u.rate = 0.92;
+  u.pitch = 1.35;   // 明るく はきはきした こえに
+  u.volume = 1;
+  if(_jaVoice) u.voice = _jaVoice;
+  window.speechSynthesis.speak(u);
+}
+
+/* 不正解ブッブー音（Web Audio） */
+function playWrongBuzz(){
+  try{
+    const ctx = window._audioCtx || (window._audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+    if(ctx.state==='suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const notes = [220, 165]; // ブッ → ブー（下がる音）
+    notes.forEach((freq, i)=>{
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.value = freq;
+      const start = now + i*0.16;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.22, start+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start+0.32);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start+0.34);
+    });
+  }catch(e){}
+}
+
+/* ================= とうけい ログ（将来の統計モード用） ================= */
+let statsLog = [];
+let statsLoaded = false;
+async function ensureStatsLoaded(){
+  if(statsLoaded) return;
+  try{
+    const r = await window.storage.get('stats-log-v1');
+    statsLog = (r && r.value) ? JSON.parse(r.value) : [];
+  }catch(e){ statsLog = []; }
+  statsLoaded = true;
+}
+async function recordStat(subject, mode, correct){
+  await ensureStatsLoaded();
+  statsLog.push({t:Date.now(), subject, mode, correct: !!correct});
+  if(statsLog.length > 500) statsLog = statsLog.slice(statsLog.length-500);
+  try{ await window.storage.set('stats-log-v1', JSON.stringify(statsLog)); }catch(e){}
+}
+ensureStatsLoaded();
+
+/* ================= バッジ・しょうごう ================= */
+const BADGE_DEFS = [];
+const KANA_KIND_LABEL = {hiragana:'ひらがな', katakana:'カタカナ'};
+Object.keys(KANA_KIND_LABEL).forEach(kind=>{
+  const label = KANA_KIND_LABEL[kind];
+  [1,2,3].forEach(lv=>{
+    BADGE_DEFS.push({id:kind+'_lv'+lv+'_clear', name:label+' レベル'+lv+' クリア', desc:label+'のレベル'+lv+'で7わりいじょう せいかい', emoji:'🎯', rarity:'common',
+      check:(d)=> (d[kind]['level'+lv+'_clears']||0) >= 1});
+    BADGE_DEFS.push({id:kind+'_lv'+lv+'_master', name:label+' レベル'+lv+' マスター', desc:label+'のレベル'+lv+'を10かい クリア', emoji:'👑', rarity:'rare',
+      check:(d)=> (d[kind]['level'+lv+'_clears']||0) >= 10});
+  });
+  BADGE_DEFS.push({id:kind+'_title', name:label+'名人', desc:label+'の ぜんレベルを マスター', emoji:'🏆', rarity:'title',
+    check:(d)=> [1,2,3].every(lv=>(d[kind]['level'+lv+'_clears']||0)>=10)});
+});
+const IRO_MODE_LABEL = {color2name:'いろ→なまえ', name2color:'なまえ→いろ'};
+Object.keys(IRO_MODE_LABEL).forEach(mode=>{
+  const label = IRO_MODE_LABEL[mode];
+  BADGE_DEFS.push({id:'iro_'+mode+'_clear', name:label+' クリア', desc:'いろクイズ「'+label+'」を クリア', emoji:'🎨', rarity:'common', check:(d)=> (d.iro[mode]||0) >= 1});
+  BADGE_DEFS.push({id:'iro_'+mode+'_master', name:label+' ★3', desc:'いろクイズ「'+label+'」で ★3を たっせい', emoji:'🌟', rarity:'rare', check:(d)=> (d.iro[mode]||0) >= 3});
+});
+BADGE_DEFS.push({id:'iro_title', name:'いろはかせ', desc:'いろクイズを りょうほう ★3', emoji:'🏆', rarity:'title', check:(d)=> (d.iro['color2name']||0)>=3 && (d.iro['name2color']||0)>=3});
+const KAZU_MODE_LABEL = {read:'きいてすうじ', count:'かぞえる', add:'たしざん'};
+Object.keys(KAZU_MODE_LABEL).forEach(mode=>{
+  const label = KAZU_MODE_LABEL[mode];
+  BADGE_DEFS.push({id:'kazu_'+mode+'_clear', name:label+' クリア', desc:'かず「'+label+'」を クリア', emoji:'🔢', rarity:'common', check:(d)=> (d.kazu[mode]||0) >= 1});
+  BADGE_DEFS.push({id:'kazu_'+mode+'_master', name:label+' ★3', desc:'かず「'+label+'」で ★3を たっせい', emoji:'🌟', rarity:'rare', check:(d)=> (d.kazu[mode]||0) >= 3});
+});
+BADGE_DEFS.push({id:'kazu_title', name:'けいさんめいじん', desc:'かずの ぜんモードで ★3', emoji:'🏆', rarity:'title', check:(d)=> Object.keys(KAZU_MODE_LABEL).every(m=>(d.kazu[m]||0)>=3)});
+const KATACHI_MODE_LABEL = {visual2name:'みてなまえ', name2visual:'きいてかたち', audio:'きいてさがす', visual:'みほんさがし'};
+Object.keys(KATACHI_MODE_LABEL).forEach(mode=>{
+  const label = KATACHI_MODE_LABEL[mode];
+  BADGE_DEFS.push({id:'katachi_'+mode+'_clear', name:label+' クリア', desc:'かたち「'+label+'」を クリア', emoji:'🔺', rarity:'common', check:(d)=> (d.katachi[mode]||0) >= 1});
+  BADGE_DEFS.push({id:'katachi_'+mode+'_master', name:label+' ★3', desc:'かたち「'+label+'」で ★3を たっせい', emoji:'🌟', rarity:'rare', check:(d)=> (d.katachi[mode]||0) >= 3});
+});
+BADGE_DEFS.push({id:'katachi_title', name:'かたちはかせ', desc:'かたちの ぜんモードで ★3', emoji:'🏆', rarity:'title', check:(d)=> Object.keys(KATACHI_MODE_LABEL).every(m=>(d.katachi[m]||0)>=3)});
+[[10,'🥉','common'],[30,'🥈','common'],[100,'🥇','rare'],[200,'💎','rare'],[500,'👑','epic']].forEach(([n,emoji,rarity])=>{
+  BADGE_DEFS.push({id:'correct_'+n, name:'せいかい '+n+'かい', desc:'ぜんたいで '+n+'もん せいかいする', emoji, rarity, check:(d)=> d.agg.totalCorrect >= n});
+});
+[[5,'common'],[20,'common'],[50,'rare']].forEach(([n,rarity])=>{
+  BADGE_DEFS.push({id:'sessions_'+n, name:'チャレンジ '+n+'かい', desc:n+'かい チャレンジを かんりょうする', emoji:'🎫', rarity, check:(d)=> d.agg.totalSessions >= n});
+});
+[[5,'common'],[10,'rare']].forEach(([n,rarity])=>{
+  BADGE_DEFS.push({id:'streak_'+n, name:n+'れんぞく せいかい', desc:n+'もん れんぞくで せいかいする', emoji:'🔥', rarity, check:(d)=> d.agg.longestStreak >= n});
+});
+[[3,'common'],[7,'common'],[14,'rare']].forEach(([n,rarity])=>{
+  BADGE_DEFS.push({id:'days_'+n, name:n+'にち あそんだ', desc:n+'にちいじょう れんしゅうする', emoji:'📅', rarity, check:(d)=> d.agg.daysPlayed >= n});
+});
+BADGE_DEFS.push({id:'allrounder', name:'オールラウンダー', desc:'5つの きょうかを ぜんぶ 1かい いじょう クリア', emoji:'🌈', rarity:'epic', check:(d)=>
+  (d.hiragana['level1_clears']||0)>=1 && (d.katakana['level1_clears']||0)>=1 &&
+  Object.values(d.iro).some(v=>v>=1) && Object.values(d.kazu).some(v=>v>=1) && Object.values(d.katachi).some(v=>v>=1)
+});
+BADGE_DEFS.push({id:'grand_champion', name:'パーフェクトチャンピオン', desc:'ぜんぶの バッジを あつめる', emoji:'👑', rarity:'title', check:null});
+
+function computeAggregates(stats){
+  const real = stats.filter(s=>s.mode!=='SESSION');
+  const sessions = stats.filter(s=>s.mode==='SESSION');
+  const totalCorrect = real.filter(s=>s.correct).length;
+  const totalSessions = sessions.length;
+  let max=0, cur=0;
+  real.forEach(s=>{ if(s.correct){ cur++; if(cur>max) max=cur; } else cur=0; });
+  const daysPlayed = new Set(stats.map(s=>new Date(s.t).toDateString())).size;
+  return {totalCorrect, totalAnswered:real.length, totalSessions, longestStreak:max, daysPlayed};
+}
+
+let badgesUnlockedCache = {};
+async function loadBadgeContext(){
+  const parseR = (r)=> (r && r.value) ? JSON.parse(r.value) : {};
+  const [h,k,i,z,t,s,u] = await Promise.all([
+    window.storage.get('hiragana-progress-v2').catch(()=>null),
+    window.storage.get('katakana-progress-v2').catch(()=>null),
+    window.storage.get('iro-progress-v1').catch(()=>null),
+    window.storage.get('kazu-progress-v1').catch(()=>null),
+    window.storage.get('katachi-progress-v1').catch(()=>null),
+    window.storage.get('stats-log-v1').catch(()=>null),
+    window.storage.get('badges-unlocked-v1').catch(()=>null),
+  ]);
+  const statsArr = (s && s.value) ? JSON.parse(s.value) : [];
+  const d = {hiragana:parseR(h), katakana:parseR(k), iro:parseR(i), kazu:parseR(z), katachi:parseR(t)};
+  d.agg = computeAggregates(statsArr);
+  const unlocked = (u && u.value) ? JSON.parse(u.value) : {};
+  return {d, unlocked};
+}
+
+async function checkAndUnlockBadges(){
+  const {d, unlocked} = await loadBadgeContext();
+  const newlyUnlocked = [];
+  BADGE_DEFS.forEach(b=>{
+    if(unlocked[b.id] || b.id==='grand_champion') return;
+    if(b.check && b.check(d)){
+      unlocked[b.id] = Date.now();
+      newlyUnlocked.push(b);
+    }
+  });
+  const grandDef = BADGE_DEFS.find(b=>b.id==='grand_champion');
+  if(grandDef && !unlocked['grand_champion']){
+    const others = BADGE_DEFS.filter(b=>b.id!=='grand_champion');
+    if(others.every(b=>unlocked[b.id])){
+      unlocked['grand_champion'] = Date.now();
+      newlyUnlocked.push(grandDef);
+    }
+  }
+  badgesUnlockedCache = unlocked;
+  if(newlyUnlocked.length > 0){
+    try{ await window.storage.set('badges-unlocked-v1', JSON.stringify(unlocked)); }catch(e){}
+    queueBadgeUnlocks(newlyUnlocked);
+  }
+  updateCurrentTitleSlot();
+}
+
+function rarityLabel(rarity){
+  return {common:'🥉 コモン', rare:'🥈 レア', epic:'💎 エピック', title:'👑 しょうごう'}[rarity] || '';
+}
+
+let jajanQueue = [];
+let jajanShowing = false;
+function queueBadgeUnlocks(list){
+  jajanQueue.push(...list);
+  if(!jajanShowing) showNextJajan();
+}
+function showNextJajan(){
+  if(jajanQueue.length === 0){ jajanShowing = false; return; }
+  jajanShowing = true;
+  const b = jajanQueue.shift();
+  document.getElementById('jajan-emoji').textContent = b.emoji;
+  document.getElementById('jajan-rarity-tag').textContent = rarityLabel(b.rarity);
+  document.getElementById('jajan-title').textContent = b.name;
+  document.getElementById('jajan-desc').textContent = b.desc;
+  const overlay = document.getElementById('jajan-overlay');
+  overlay.classList.remove('hidden');
+  void overlay.offsetWidth;
+  overlay.classList.add('show');
+  playCorrectChime();
+  launchStamp('🎉');
+}
+function closeJajan(){
+  const overlay = document.getElementById('jajan-overlay');
+  overlay.classList.add('hidden');
+  overlay.classList.remove('show');
+  showNextJajan();
+}
+
+let badgeTab = 'all';
+let badgesViewedCache = {};
+async function loadBadgeViewed(){
+  try{
+    const r = await window.storage.get('badges-viewed-v1');
+    badgesViewedCache = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ badgesViewedCache = {}; }
+}
+async function saveBadgeViewed(){
+  try{ await window.storage.set('badges-viewed-v1', JSON.stringify(badgesViewedCache)); }catch(e){}
+}
+async function openBadges(){
+  const {unlocked} = await loadBadgeContext();
+  badgesUnlockedCache = unlocked;
+  await loadBadgeViewed();
+  badgeTab = 'all';
+  renderBadgeList();
+  showScreen('screen-badges');
+}
+function setBadgeTab(tab){
+  badgeTab = tab;
+  ['all','unlocked','locked'].forEach(t=>{
+    document.getElementById('badge-tab-'+t).classList.toggle('active', t===tab);
+  });
+  renderBadgeList();
+}
+function renderBadgeList(){
+  const unlockedCount = Object.keys(badgesUnlockedCache).length;
+  document.getElementById('badges-progress-text').textContent = `${unlockedCount} / ${BADGE_DEFS.length} こ かくとく`;
+  let list = BADGE_DEFS;
+  if(badgeTab==='unlocked') list = BADGE_DEFS.filter(b=>badgesUnlockedCache[b.id]);
+  if(badgeTab==='locked') list = BADGE_DEFS.filter(b=>!badgesUnlockedCache[b.id]);
+  const wrap = document.getElementById('badge-list');
+  wrap.innerHTML = list.map(b=>{
+    const isUnlocked = !!badgesUnlockedCache[b.id];
+    const isNew = isUnlocked && !badgesViewedCache[b.id];
+    return `<div class="badge-card ${isUnlocked?'unlocked rarity-'+b.rarity:'locked'}" onclick="tapBadgeCard('${b.id}')">
+      ${isNew ? '<div class="badge-new-badge">NEW</div>' : ''}
+      <div class="bc-emoji">${isUnlocked ? b.emoji : '🔒'}</div>
+      <div class="bc-name">${isUnlocked ? b.name : '？？？'}</div>
+      <div class="bc-desc">${isUnlocked ? b.desc : 'タップで ヒント'}</div>
+    </div>`;
+  }).join('');
+}
+function tapBadgeCard(id){
+  const b = BADGE_DEFS.find(x=>x.id===id);
+  if(!b) return;
+  const isUnlocked = !!badgesUnlockedCache[id];
+  document.getElementById('bdm-emoji').textContent = isUnlocked ? b.emoji : '🔒';
+  document.getElementById('bdm-rarity').textContent = isUnlocked ? rarityLabel(b.rarity) : 'ヒント';
+  document.getElementById('bdm-name').textContent = isUnlocked ? b.name : '？？？（みかくとく）';
+  document.getElementById('bdm-desc').textContent = b.desc;
+  const dateEl = document.getElementById('bdm-date');
+  if(isUnlocked && badgesUnlockedCache[id]){
+    const dt = new Date(badgesUnlockedCache[id]);
+    dateEl.textContent = 'かくとくび：' + dt.getFullYear()+'/'+(dt.getMonth()+1)+'/'+dt.getDate();
+    dateEl.style.display = 'block';
+  } else {
+    dateEl.style.display = 'none';
+  }
+  document.getElementById('badge-detail-modal').classList.remove('hidden');
+  if(isUnlocked && !badgesViewedCache[id]){
+    badgesViewedCache[id] = true;
+    saveBadgeViewed();
+  }
+}
+function closeBadgeDetail(){
+  document.getElementById('badge-detail-modal').classList.add('hidden');
+  renderBadgeList();
+}
+
+function updateCurrentTitleSlot(){
+  const slot = document.getElementById('current-title-slot');
+  if(!slot) return;
+  const titleBadges = BADGE_DEFS.filter(b=>b.rarity==='title' && badgesUnlockedCache[b.id]);
+  if(titleBadges.length===0){ slot.innerHTML=''; return; }
+  titleBadges.sort((a,b)=> badgesUnlockedCache[b.id]-badgesUnlockedCache[a.id]);
+  const latest = titleBadges[0];
+  slot.innerHTML = `<div class="current-title-pill">👑 げんざいの しょうごう：${latest.name}</div>`;
+}
+
+/* ================= きろく（とうけい）画面 ================= */
+const STATS_SUBJECT_LABEL = {'kana-hiragana':'ひらがな','kana-katakana':'カタカナ','iro':'いろ','kazu':'かず','katachi':'かたち'};
+const STATS_MODE_LABEL = {
+  'kana-hiragana': {level1:'レベル1（1もじ）', level2:'レベル2（2〜3もじ）', level3:'レベル3（4もじ〜）'},
+  'kana-katakana': {level1:'レベル1（1もじ）', level2:'レベル2（2〜3もじ）', level3:'レベル3（4もじ〜）'},
+  'iro': {color2name:'いろ→なまえ', name2color:'なまえ→いろ'},
+  'kazu': {read:'きいてすうじ', count:'かぞえる', add:'たしざん'},
+  'katachi': {visual2name:'みてなまえ', name2visual:'きいてかたち', audio:'きいてさがす', visual:'みほんさがし'},
+};
+async function openStats(){
+  await ensureStatsLoaded();
+  renderStats();
+  showScreen('screen-stats');
+}
+function renderStats(){
+  const real = statsLog.filter(s=>s.mode!=='SESSION');
+  const agg = computeAggregates(statsLog);
+  const accuracy = agg.totalAnswered>0 ? Math.round(agg.totalCorrect/agg.totalAnswered*100) : 0;
+  document.getElementById('stats-cards').innerHTML = `
+    <div class="stat-card"><div class="stc-num">${agg.totalSessions}</div><div class="stc-label">チャレンジかいすう</div></div>
+    <div class="stat-card"><div class="stc-num">${accuracy}%</div><div class="stc-label">せいかいりつ</div></div>
+    <div class="stat-card"><div class="stc-num">${agg.totalCorrect}</div><div class="stc-label">せいかいもんすう</div></div>
+    <div class="stat-card"><div class="stc-num">${agg.daysPlayed}</div><div class="stc-label">あそんだ にっすう</div></div>
+  `;
+  const subjWrap = document.getElementById('stats-subjects');
+  if(real.length===0){
+    subjWrap.innerHTML = '<div class="stat-empty">まだ きろくが ないよ。あそんでみよう！</div>';
+    return;
+  }
+  const subjects = Object.keys(STATS_SUBJECT_LABEL);
+  subjWrap.innerHTML = subjects.map(subj=>{
+    const items = real.filter(s=>s.subject===subj);
+    if(items.length===0) return '';
+    const correct = items.filter(s=>s.correct).length;
+    const pct = Math.round(correct/items.length*100);
+    const modeLabels = STATS_MODE_LABEL[subj] || {};
+    const modeRows = Object.keys(modeLabels).map(m=>{
+      const mItems = items.filter(s=>s.mode===m);
+      if(mItems.length===0) return '';
+      const mCorrect = mItems.filter(s=>s.correct).length;
+      const mPct = Math.round(mCorrect/mItems.length*100);
+      return `<div class="stat-sub-row">
+        <div class="ssub-label"><span>${modeLabels[m]}</span><span>${mPct}%（${mItems.length}もん）</span></div>
+        <div class="stat-bar-bg-sm"><div class="stat-bar-fill-sm" style="width:${mPct}%"></div></div>
+      </div>`;
+    }).join('');
+    return `<div class="stat-subject-block">
+      <div class="stat-subject-row">
+        <div class="ssr-label"><span>${STATS_SUBJECT_LABEL[subj]}（ぜんたい）</span><span>${pct}%（${items.length}もん）</span></div>
+        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+      ${modeRows}
+    </div>`;
+  }).join('');
+}
+function playCorrectChime(){
+  try{
+    const ctx = window._audioCtx || (window._audioCtx = new (window.AudioContext||window.webkitAudioContext)());
+    if(ctx.state==='suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const notes = [988, 1319]; // ピン → ポン（B5 → E6）
+    notes.forEach((freq, i)=>{
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      const start = now + i*0.13;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.35, start+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start+0.28);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(start);
+      osc.stop(start+0.3);
+    });
+  }catch(e){}
+}
+
+/* ================= 五十音表 ================= */
+function transposeLayout(layout){
+  const numCols = layout.length;   // 子音グループ数（あ・か・さ…）
+  const numRows = 5;               // 母音（あ・い・う・え・お）
+  const result = [];
+  for(let r=0;r<numRows;r++){
+    const rowArr = [];
+    for(let c=numCols-1;c>=0;c--){   // 右から左へ あ・か・さ…と並ぶよう逆順に
+      rowArr.push(layout[c][r]);
+    }
+    result.push(rowArr);
+  }
+  return result;
+}
+function openTable(){
+  document.getElementById('table-title').textContent = KIND_DATA[currentKind].title + '　ひょう';
+  showScreen('screen-table');
+  const grid = document.getElementById('gojuon-table');
+  const transposed = transposeLayout(KIND_DATA[currentKind].layout);
+  let html = '';
+  transposed.forEach(row=>{
+    row.forEach(ch=>{
+      if(ch===null){ html += `<div class="gj-cell empty"></div>`; }
+      else { html += `<div class="gj-cell ${(ch==='ん'||ch==='ン')?'n-cell':''}" onclick="tapTableChar('${ch}')">${ch}</div>`; }
+    });
+  });
+  grid.innerHTML = html;
+  document.getElementById('table-word-box').className = 'table-word-box empty-state';
+  document.getElementById('table-word-box').textContent = 'もじを タップしてみてね';
+}
+function tapTableChar(ch){
+  speak((ch==='ん'||ch==='ン') ? ch+'ー' : ch);
+  const info = KIND_DATA[currentKind].wordMap[ch];
+  const box = document.getElementById('table-word-box');
+  box.className = 'table-word-box';
+  box.innerHTML = `<div class="tw-emoji">${info.e}</div><div class="tw-text"><div class="tw-char">${ch}</div><div class="tw-word">${info.w}</div></div>`;
+}
+
+/* ================= レベル選択 ================= */
+function renderLevelGrid(){
+  const grid = document.getElementById('level-grid');
+  grid.innerHTML = LEVELS.map((lv,idx)=>{
+    const clears = Math.min(progress['level'+lv.id+'_clears'] || 0, 10);
+    const mastered = clears >= 10;
+    const prevMastered = idx===0 || (progress['level'+LEVELS[idx-1].id+'_clears']||0) >= 10;
+    const locked = !prevMastered;
+    return `<button class="level-btn ${mastered?'done':''} ${locked?'locked':''}" ${locked?'disabled':''} onclick="startLevel(${lv.id})">
+      <div><div class="lv-name">${lv.name} ${locked?'🔒':(mastered?'👑':'')}</div><div class="lv-desc">${lv.desc}（7わり いじょうで 1かい クリア）</div></div>
+      <div class="lv-stars">🎯 ${clears}/10</div>
+    </button>`;
+  }).join('');
+}
+
+/* ================= クイズ生成 ================= */
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+function sampleQuestions(pool, count, mapFn){
+  if(pool.length === 0) return [];
+  let source;
+  if(pool.length >= count){
+    source = shuffle(pool).slice(0, count);
+  } else {
+    // プールが少ない場合はランダムに重複ありで埋める
+    source = [];
+    for(let i=0;i<count;i++){
+      source.push(pool[randInt(0, pool.length-1)]);
+    }
+  }
+  return shuffle(source).map(mapFn);
+}
+function buildQuizList(level){
+  const allChars = kindAllChars(currentKind);
+  const wordPool = kindWordPool(currentKind);
+  if(level.id===1){
+    return sampleQuestions(allChars, level.qCount, c=>({type:'char', answer:c}));
+  } else {
+    const [min,max] = level.wordLen;
+    const pool = wordPool.filter(w=>w.length>=min && w.length<=max);
+    const usable = pool.length>=4 ? pool : wordPool; // 単語が少なすぎる場合は全体から
+    return sampleQuestions(usable, level.qCount, w=>({type:'word', answer:w}));
+  }
+}
+
+function startLevel(id){
+  currentLevel = LEVELS.find(l=>l.id===id);
+  quizList = buildQuizList(currentLevel);
+  quizIdx = 0; quizCorrectFirstTry = 0;
+  showScreen('screen-quiz');
+  document.getElementById('quiz-instruction').textContent =
+    currentLevel.id===1 ? 'きこえた もじは どれかな？' : 'きこえた ことばは どれかな？';
+  renderQuiz();
+}
+
+function renderQuiz(){
+  quizWaiting = false;
+  const total = quizList.length;
+  document.getElementById('quiz-progress').textContent = `${currentLevel.name} ${quizIdx+1}/${total}`;
+  document.getElementById('quiz-bar').style.width = ((quizIdx+1)/total*100)+'%';
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-feedback').className = 'feedback';
+
+  const q = quizList[quizIdx];
+  const grid = document.getElementById('quiz-opts');
+
+  if(q.type==='char'){
+    const allChars = kindAllChars(currentKind);
+    let opts = shuffle(allChars.filter(c=>c!==q.answer)).slice(0,3);
+    opts.push(q.answer);
+    opts = shuffle(opts);
+    grid.innerHTML = opts.map(c=>`<button class="opt-btn" data-val="${c}" onclick="answerQuiz('${c}', this)">${c}</button>`).join('');
+  } else {
+    const wordPool = kindWordPool(currentKind);
+    let distractors = shuffle(wordPool.filter(w=>w!==q.answer));
+    let opts = distractors.slice(0,3);
+    opts.push(q.answer);
+    opts = shuffle(opts);
+    grid.innerHTML = opts.map(w=>`<button class="opt-btn word-opt" data-val="${w}" onclick="answerQuiz('${w}', this)">${w}</button>`).join('');
+  }
+  setTimeout(playQuizSound, 250);
+}
+function playQuizSound(){
+  speak(quizList[quizIdx].answer);
+}
+function answerQuiz(chosen, btn){
+  if(quizWaiting) return;
+  quizWaiting = true;
+  const answer = quizList[quizIdx].answer;
+  const fb = document.getElementById('quiz-feedback');
+  const grid = document.getElementById('quiz-opts');
+  const isCorrect = chosen === answer;
+  recordStat('kana-'+currentKind, 'level'+currentLevel.id, isCorrect);
+  if(isCorrect){
+    btn.classList.add('correct');
+    fb.textContent = 'せいかい！ 🎉';
+    fb.className = 'feedback correct';
+    launchStamp('🌟');
+    playCorrectChime();
+    quizCorrectFirstTry++;
+  } else {
+    btn.classList.add('wrong');
+    grid.querySelectorAll('[data-val]').forEach(el=>{ if(el.dataset.val===answer) el.classList.add('correct'); });
+    fb.textContent = 'おしい！ せいかいは 「'+answer+'」';
+    fb.className = 'feedback wrong';
+    playWrongBuzz();
+  }
+  setTimeout(()=>{
+    quizIdx++;
+    if(quizIdx < quizList.length) renderQuiz();
+    else finishQuiz();
+  }, 1100);
+}
+function finishQuiz(){
+  const total = quizList.length;
+  const correctCount = quizCorrectFirstTry;
+  const pct = correctCount/total;
+  const cleared = pct >= 0.7;
+  const key = 'level'+currentLevel.id+'_clears';
+  if(cleared){
+    progress[key] = Math.min((progress[key]||0) + 1, 10);
+  }
+  saveProgress();
+  recordStat('kana-'+currentKind, 'SESSION', cleared);
+  checkAndUnlockBadges();
+  showResult(pct, cleared);
+}
+
+/* ================= 結果 ================= */
+function showResult(pct, cleared){
+  showScreen('screen-result');
+  const clears = progress['level'+currentLevel.id+'_clears'] || 0;
+  const pctDisp = Math.round(pct*100);
+  const justMastered = cleared && clears>=10;
+  const emojiEl = document.getElementById('result-emoji');
+  const titleEl = document.getElementById('result-title');
+  const starsEl = document.getElementById('result-stars');
+  starsEl.style.fontSize = '22px';
+  starsEl.style.letterSpacing = 'normal';
+  if(justMastered){
+    emojiEl.textContent = '👑';
+    titleEl.textContent = 'マスター！ つぎの レベルが あいたよ';
+  } else if(cleared){
+    emojiEl.textContent = '🎉';
+    titleEl.textContent = `クリア！（せいかいりつ ${pctDisp}%）`;
+  } else {
+    emojiEl.textContent = '💪';
+    titleEl.textContent = `もう すこし！（せいかいりつ ${pctDisp}%）`;
+  }
+  starsEl.textContent = `🎯 ${Math.min(clears,10)} / 10 かい クリア`;
+  if(cleared){ launchStamp('🎊'); launchStamp('✨'); }
+}
+function retryLevel(){
+  startLevel(currentLevel.id);
+}
+
+/* ================= 演出 ================= */
+function launchStamp(emoji){
+  const el = document.createElement('div');
+  el.className = 'stamp';
+  el.textContent = emoji;
+  el.style.left = (30+Math.random()*40)+'%';
+  el.style.bottom = '20%';
+  document.getElementById('stamp-container').appendChild(el);
+  setTimeout(()=>el.remove(), 1000);
+}
+/* ================= いろ あてクイズ ================= */
+const COLORS = [
+  {name:'あか', hex:'#FF3B30'},
+  {name:'あお', hex:'#0A84FF'},
+  {name:'きいろ', hex:'#FFD400'},
+  {name:'みどり', hex:'#34C759'},
+  {name:'オレンジ', hex:'#FF9500'},
+  {name:'むらさき', hex:'#AF52DE'},
+  {name:'ピンク', hex:'#FF6482'},
+  {name:'ちゃいろ', hex:'#8B5E3C'},
+  {name:'くろ', hex:'#2C2C2E'},
+  {name:'しろ', hex:'#F4F4F6'},
+];
+let currentIroMode = null;
+let iroQuizList = [], iroIdx = 0, iroCorrectFirstTry = 0, iroWaiting = false;
+let iroProgress = {};
+
+async function loadIroProgress(){
+  try{
+    const r = await window.storage.get('iro-progress-v1');
+    iroProgress = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ iroProgress = {}; }
+}
+async function saveIroProgress(){
+  try{ await window.storage.set('iro-progress-v1', JSON.stringify(iroProgress)); }catch(e){}
+}
+async function resetIroProgress(){
+  iroProgress = {};
+  await saveIroProgress();
+  renderIroHome();
+}
+async function openIro(){
+  await loadIroProgress();
+  renderIroHome();
+  showScreen('screen-iro-home');
+}
+function renderIroHome(){
+  const a = iroProgress['color2name'] || 0;
+  const b = iroProgress['name2color'] || 0;
+  document.getElementById('iro-stars-a').textContent = a>0 ? '⭐'.repeat(a) : '';
+  document.getElementById('iro-stars-b').textContent = b>0 ? '⭐'.repeat(b) : '';
+}
+
+function startIroQuiz(mode){
+  currentIroMode = mode;
+  iroQuizList = shuffle(COLORS).slice(0, 8);
+  iroIdx = 0; iroCorrectFirstTry = 0;
+  showScreen('screen-iro-quiz');
+  renderIroQuiz();
+}
+
+function renderIroQuiz(){
+  iroWaiting = false;
+  const total = iroQuizList.length;
+  document.getElementById('iro-quiz-progress').textContent = `${iroIdx+1} / ${total}`;
+  document.getElementById('iro-quiz-bar').style.width = ((iroIdx+1)/total*100)+'%';
+  document.getElementById('iro-quiz-feedback').textContent = '';
+  document.getElementById('iro-quiz-feedback').className = 'feedback';
+
+  const c = iroQuizList[iroIdx];
+  const qbox = document.getElementById('iro-quiz-question');
+  const grid = document.getElementById('iro-quiz-opts');
+  let opts = shuffle(COLORS.filter(x=>x.name!==c.name)).slice(0,3);
+  opts.push(c);
+  opts = shuffle(opts);
+
+  if(currentIroMode==='color2name'){
+    qbox.innerHTML = `<div class="color-swatch-big" style="background:${c.hex}"></div><p class="iro-question-text">なにいろ かな？</p>`;
+    grid.innerHTML = opts.map(o=>`<button class="opt-btn word-opt" data-val="${o.name}" onclick="answerIro('${o.name}', this)">${o.name}</button>`).join('');
+  } else {
+    qbox.innerHTML = `<button class="quiz-speaker-btn" onclick="speak('${c.name}')">🔊</button><p class="iro-question-text">${c.name}</p>`;
+    grid.innerHTML = opts.map(o=>`<div class="opt-btn opt-color" data-val="${o.name}" style="background:${o.hex}" onclick="answerIro('${o.name}', this)"></div>`).join('');
+    setTimeout(()=>speak(c.name), 250);
+  }
+}
+
+function answerIro(chosen, el){
+  if(iroWaiting) return;
+  iroWaiting = true;
+  const answer = iroQuizList[iroIdx].name;
+  const fb = document.getElementById('iro-quiz-feedback');
+  const grid = document.getElementById('iro-quiz-opts');
+  const isCorrect = chosen === answer;
+  recordStat('iro', currentIroMode, isCorrect);
+  if(isCorrect){
+    el.classList.add('correct');
+    fb.textContent = 'せいかい！ 🎉';
+    fb.className = 'feedback correct';
+    launchStamp('🌟');
+    playCorrectChime();
+    iroCorrectFirstTry++;
+  } else {
+    el.classList.add('wrong');
+    grid.querySelectorAll('[data-val]').forEach(o=>{ if(o.dataset.val===answer) o.classList.add('correct'); });
+    fb.textContent = 'おしい！ せいかいは 「'+answer+'」';
+    fb.className = 'feedback wrong';
+    playWrongBuzz();
+  }
+  setTimeout(()=>{
+    iroIdx++;
+    if(iroIdx < iroQuizList.length) renderIroQuiz();
+    else finishIroQuiz();
+  }, 1100);
+}
+
+function finishIroQuiz(){
+  const total = iroQuizList.length;
+  const pct = iroCorrectFirstTry/total;
+  let stars = 1;
+  if(pct >= 0.9) stars = 3;
+  else if(pct >= 0.6) stars = 2;
+  iroProgress[currentIroMode] = Math.max(iroProgress[currentIroMode]||0, stars);
+  saveIroProgress();
+  recordStat('iro', 'SESSION', true);
+  checkAndUnlockBadges();
+  showIroResult(stars);
+}
+
+function showIroResult(stars){
+  showScreen('screen-iro-result');
+  const ranks = [
+    {min:3, emoji:'🏆', title:'かんぺき！'},
+    {min:2, emoji:'🎉', title:'よくできました！'},
+    {min:1, emoji:'💪', title:'もう すこし！'},
+  ];
+  const rank = ranks.find(r=>stars>=r.min) || ranks[ranks.length-1];
+  document.getElementById('iro-result-emoji').textContent = rank.emoji;
+  document.getElementById('iro-result-title').textContent = rank.title;
+  document.getElementById('iro-result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(stars>=2){ launchStamp('🎊'); launchStamp('✨'); }
+}
+/* ================= かず ================= */
+const NUMBERS = [
+  {n:1,y:'いち'},{n:2,y:'に'},{n:3,y:'さん'},{n:4,y:'よん'},{n:5,y:'ご'},
+  {n:6,y:'ろく'},{n:7,y:'なな'},{n:8,y:'はち'},{n:9,y:'きゅう'},{n:10,y:'じゅう'},
+];
+const OBJECT_EMOJIS = ['🍎','🍓','⭐','🎈','🐟','🍊','🐶','🌸','🍭','🚗'];
+
+let currentKazuMode = null;
+let kazuQuizList = [], kazuIdx = 0, kazuCorrectFirstTry = 0, kazuWaiting = false;
+let kazuProgress = {};
+
+async function loadKazuProgress(){
+  try{
+    const r = await window.storage.get('kazu-progress-v1');
+    kazuProgress = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ kazuProgress = {}; }
+}
+async function saveKazuProgress(){
+  try{ await window.storage.set('kazu-progress-v1', JSON.stringify(kazuProgress)); }catch(e){}
+}
+async function resetKazuProgress(){
+  kazuProgress = {};
+  await saveKazuProgress();
+  renderKazuHome();
+}
+async function openKazu(){
+  await loadKazuProgress();
+  renderKazuHome();
+  showScreen('screen-kazu-home');
+}
+function renderKazuHome(){
+  ['read','count','add'].forEach(m=>{
+    const s = kazuProgress[m] || 0;
+    document.getElementById('kazu-stars-'+m).textContent = s>0 ? '　⭐'.repeat(s) : '';
+  });
+}
+
+/* --- すうじ ひょう --- */
+function openKazuTable(){
+  showScreen('screen-kazu-table');
+  const grid = document.getElementById('suji-table');
+  grid.innerHTML = NUMBERS.map(o=>
+    `<div class="suji-cell" onclick="tapSujiCell(${o.n})"><span class="sc-num">${o.n}</span><span class="sc-yomi">${o.y}</span></div>`
+  ).join('');
+  const box = document.getElementById('suji-word-box');
+  box.className = 'table-word-box empty-state';
+  box.textContent = 'すうじを タップしてみてね';
+}
+function tapSujiCell(n){
+  const item = NUMBERS.find(o=>o.n===n);
+  speak(item.y);
+  const emoji = OBJECT_EMOJIS[n % OBJECT_EMOJIS.length];
+  const box = document.getElementById('suji-word-box');
+  box.className = 'table-word-box';
+  box.innerHTML = `<div style="text-align:left;"><div class="tw-char" style="color:#fff;">${n}（${item.y}）</div><div class="obj-grid">${Array(n).fill('<span>'+emoji+'</span>').join('')}</div></div>`;
+}
+
+/* --- クイズ生成 --- */
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+function pickDistractors(correct, min, max, count){
+  const set = new Set();
+  while(set.size < count){
+    const v = randInt(min,max);
+    if(v !== correct) set.add(v);
+  }
+  return [...set];
+}
+
+function buildKazuQuizList(mode){
+  if(mode==='read'){
+    return shuffle(NUMBERS).map(o=>({n:o.n, y:o.y}));
+  }
+  if(mode==='count'){
+    const list = [];
+    for(let i=0;i<10;i++){
+      const n = randInt(1,10);
+      const emoji = OBJECT_EMOJIS[randInt(0,OBJECT_EMOJIS.length-1)];
+      list.push({n, emoji});
+    }
+    return list;
+  }
+  // add
+  const list = [];
+  for(let i=0;i<10;i++){
+    const a = randInt(1,5), b = randInt(1,5);
+    const bb = Math.min(b, 10-a);
+    const emoji = OBJECT_EMOJIS[randInt(0,OBJECT_EMOJIS.length-1)];
+    list.push({a, b:bb, n:a+bb, emoji});
+  }
+  return list;
+}
+
+function startKazuQuiz(mode){
+  currentKazuMode = mode;
+  kazuQuizList = buildKazuQuizList(mode);
+  kazuIdx = 0; kazuCorrectFirstTry = 0;
+  showScreen('screen-kazu-quiz');
+  renderKazuQuiz();
+}
+
+function renderKazuQuiz(){
+  kazuWaiting = false;
+  const total = kazuQuizList.length;
+  document.getElementById('kazu-quiz-progress').textContent = `${kazuIdx+1} / ${total}`;
+  document.getElementById('kazu-quiz-bar').style.width = ((kazuIdx+1)/total*100)+'%';
+  document.getElementById('kazu-quiz-feedback').textContent = '';
+  document.getElementById('kazu-quiz-feedback').className = 'feedback';
+
+  const q = kazuQuizList[kazuIdx];
+  const qbox = document.getElementById('kazu-quiz-question');
+  const grid = document.getElementById('kazu-quiz-opts');
+  const correct = q.n;
+
+  if(currentKazuMode==='read'){
+    qbox.innerHTML = `<button class="quiz-speaker-btn" onclick="speak('${q.y}')">🔊</button><p class="iro-question-text">きこえた すうじは どれかな？</p>`;
+    setTimeout(()=>speak(q.y), 250);
+  } else if(currentKazuMode==='count'){
+    qbox.innerHTML = `<div class="obj-grid">${Array(q.n).fill('<span>'+q.emoji+'</span>').join('')}</div><p class="iro-question-text">いくつ あるかな？</p>`;
+  } else {
+    qbox.innerHTML = `
+      <div class="add-row">
+        <div class="obj-grid">${Array(q.a).fill('<span>'+q.emoji+'</span>').join('')}</div>
+        <span class="add-sym">＋</span>
+        <div class="obj-grid">${Array(q.b).fill('<span>'+q.emoji+'</span>').join('')}</div>
+      </div>
+      <p class="iro-question-text">あわせて いくつ かな？</p>`;
+  }
+
+  const distractors = pickDistractors(correct, 1, 10, 3);
+  const opts = shuffle([correct, ...distractors]);
+  grid.innerHTML = opts.map(v=>`<button class="opt-btn" data-val="${v}" onclick="answerKazu(${v}, this, ${correct})">${v}</button>`).join('');
+}
+
+function answerKazu(chosen, el, correct){
+  if(kazuWaiting) return;
+  kazuWaiting = true;
+  const fb = document.getElementById('kazu-quiz-feedback');
+  const grid = document.getElementById('kazu-quiz-opts');
+  const isCorrect = chosen === correct;
+  recordStat('kazu', currentKazuMode, isCorrect);
+  if(isCorrect){
+    el.classList.add('correct');
+    fb.textContent = 'せいかい！ 🎉';
+    fb.className = 'feedback correct';
+    launchStamp('🌟');
+    playCorrectChime();
+    kazuCorrectFirstTry++;
+  } else {
+    el.classList.add('wrong');
+    grid.querySelectorAll('[data-val]').forEach(o=>{ if(Number(o.dataset.val)===correct) o.classList.add('correct'); });
+    fb.textContent = 'おしい！ せいかいは 「'+correct+'」';
+    fb.className = 'feedback wrong';
+    playWrongBuzz();
+  }
+  setTimeout(()=>{
+    kazuIdx++;
+    if(kazuIdx < kazuQuizList.length) renderKazuQuiz();
+    else finishKazuQuiz();
+  }, 1100);
+}
+
+function finishKazuQuiz(){
+  const total = kazuQuizList.length;
+  const pct = kazuCorrectFirstTry/total;
+  let stars = 1;
+  if(pct >= 0.9) stars = 3;
+  else if(pct >= 0.6) stars = 2;
+  kazuProgress[currentKazuMode] = Math.max(kazuProgress[currentKazuMode]||0, stars);
+  saveKazuProgress();
+  recordStat('kazu', 'SESSION', true);
+  checkAndUnlockBadges();
+  showKazuResult(stars);
+}
+
+function showKazuResult(stars){
+  showScreen('screen-kazu-result');
+  const ranks = [
+    {min:3, emoji:'🏆', title:'かんぺき！'},
+    {min:2, emoji:'🎉', title:'よくできました！'},
+    {min:1, emoji:'💪', title:'もう すこし！'},
+  ];
+  const rank = ranks.find(r=>stars>=r.min) || ranks[ranks.length-1];
+  document.getElementById('kazu-result-emoji').textContent = rank.emoji;
+  document.getElementById('kazu-result-title').textContent = rank.title;
+  document.getElementById('kazu-result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(stars>=2){ launchStamp('🎊'); launchStamp('✨'); }
+}
+/* ================= かたち ================= */
+const SHAPES = [
+  {key:'circle', name:'まる'},
+  {key:'oval', name:'だえん'},
+  {key:'triangle', name:'さんかく'},
+  {key:'square', name:'しかく'},
+  {key:'rectangle', name:'ちょうほうけい'},
+  {key:'rhombus', name:'ひしがた'},
+  {key:'trapezoid', name:'だいけい'},
+  {key:'pentagon', name:'ごかくけい'},
+  {key:'hexagon', name:'ろっかくけい'},
+  {key:'star', name:'ほし'},
+  {key:'heart', name:'ハート'},
+];
+const SHAPE_COLORS = ['#FF6B6B','#4ECDC4','#FFD93D','#6EC6FF','#B06EF5','#8CD98C','#FF9F1C','#FF6482'];
+const SHAPE_HEIGHT_RATIO = {rectangle:0.6, oval:0.65, trapezoid:0.8};
+function randomShapeColor(){ return SHAPE_COLORS[randInt(0,SHAPE_COLORS.length-1)]; }
+function renderShapeDiv(key, sizePx, colorHex){
+  if(key==='heart'){ return `<span style="font-size:${sizePx}px;line-height:1;">❤️</span>`; }
+  const h = Math.round(sizePx * (SHAPE_HEIGHT_RATIO[key] || 1));
+  return `<div class="shape-el shape-${key}" style="width:${sizePx}px;height:${h}px;background:${colorHex};"></div>`;
+}
+
+let currentKatachiKind = null;   // 'basic' | 'scene'
+let currentKatachiMode = null;   // visual2name / name2visual / audio / visual
+let katachiQuizList = [], katachiIdx = 0, katachiCorrectFirstTry = 0, katachiWaiting = false;
+let katachiSceneRounds = [], katachiRoundIdx = 0, katachiRoundsCorrectFirstTry = 0;
+let katachiFoundIds = new Set(), katachiRemainingTarget = 0, katachiRoundHadWrong = false;
+let katachiProgress = {};
+
+async function loadKatachiProgress(){
+  try{
+    const r = await window.storage.get('katachi-progress-v1');
+    katachiProgress = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ katachiProgress = {}; }
+}
+async function saveKatachiProgress(){
+  try{ await window.storage.set('katachi-progress-v1', JSON.stringify(katachiProgress)); }catch(e){}
+}
+async function resetKatachiProgress(){
+  katachiProgress = {};
+  await saveKatachiProgress();
+  renderKatachiHome();
+}
+async function openKatachi(){
+  await loadKatachiProgress();
+  renderKatachiHome();
+  showScreen('screen-katachi-home');
+}
+function renderKatachiHome(){
+  ['visual2name','name2visual','audio','visual'].forEach(m=>{
+    const s = katachiProgress[m] || 0;
+    document.getElementById('katachi-stars-'+m).textContent = s>0 ? '　⭐'.repeat(s) : '';
+  });
+}
+
+/* --- 4択（見て／きいて） --- */
+function buildKatachiBasicList(){
+  let list = [];
+  for(let round=0; round<3; round++){
+    shuffle(SHAPES).forEach(s=> list.push({key:s.key, name:s.name}));
+  }
+  return list;
+}
+function startKatachiBasic(mode){
+  currentKatachiKind = 'basic';
+  currentKatachiMode = mode;
+  katachiQuizList = buildKatachiBasicList();
+  katachiIdx = 0; katachiCorrectFirstTry = 0;
+  showScreen('screen-katachi-quiz');
+  renderKatachiQuiz();
+}
+function renderKatachiQuiz(){
+  katachiWaiting = false;
+  const total = katachiQuizList.length;
+  document.getElementById('katachi-quiz-progress').textContent = `${katachiIdx+1} / ${total}`;
+  document.getElementById('katachi-quiz-bar').style.width = ((katachiIdx+1)/total*100)+'%';
+  document.getElementById('katachi-quiz-feedback').textContent = '';
+  document.getElementById('katachi-quiz-feedback').className = 'feedback';
+
+  const q = katachiQuizList[katachiIdx];
+  const qbox = document.getElementById('katachi-quiz-question');
+  const grid = document.getElementById('katachi-quiz-opts');
+
+  if(currentKatachiMode==='visual2name'){
+    qbox.innerHTML = `<div class="shape-stage">${renderShapeDiv(q.key, 90, randomShapeColor())}</div><p class="iro-question-text">これは なにかな？</p>`;
+    const distractors = shuffle(SHAPES.filter(s=>s.key!==q.key)).slice(0,3).map(s=>s.name);
+    const opts = shuffle([q.name, ...distractors]);
+    grid.innerHTML = opts.map(nm=>`<button class="opt-btn word-opt" data-val="${nm}" onclick="answerKatachiQuiz('${nm}', this, '${q.name}')">${nm}</button>`).join('');
+  } else {
+    qbox.innerHTML = `<button class="quiz-speaker-btn" onclick="speak('${q.name}')">🔊</button><p class="iro-question-text">${q.name}</p>`;
+    setTimeout(()=>speak(q.name), 250);
+    const distractorKeys = shuffle(SHAPES.filter(s=>s.key!==q.key)).slice(0,3).map(s=>s.key);
+    const optKeys = shuffle([q.key, ...distractorKeys]);
+    grid.innerHTML = optKeys.map(k=>`<div class="opt-btn opt-shape" data-val="${k}" onclick="answerKatachiQuiz('${k}', this, '${q.key}')">${renderShapeDiv(k,54,randomShapeColor())}</div>`).join('');
+  }
+}
+function answerKatachiQuiz(chosen, el, correct){
+  if(katachiWaiting) return;
+  katachiWaiting = true;
+  const fb = document.getElementById('katachi-quiz-feedback');
+  const grid = document.getElementById('katachi-quiz-opts');
+  const isCorrect = chosen === correct;
+  recordStat('katachi', currentKatachiMode, isCorrect);
+  if(isCorrect){
+    el.classList.add('correct');
+    fb.textContent = 'せいかい！ 🎉';
+    fb.className = 'feedback correct';
+    launchStamp('🌟');
+    playCorrectChime();
+    katachiCorrectFirstTry++;
+  } else {
+    el.classList.add('wrong');
+    grid.querySelectorAll('[data-val]').forEach(o=>{ if(o.dataset.val===correct) o.classList.add('correct'); });
+    fb.textContent = 'おしい！';
+    fb.className = 'feedback wrong';
+    playWrongBuzz();
+  }
+  setTimeout(()=>{
+    katachiIdx++;
+    if(katachiIdx < katachiQuizList.length) renderKatachiQuiz();
+    else finishKatachiBasic();
+  }, 1100);
+}
+function finishKatachiBasic(){
+  const total = katachiQuizList.length;
+  const pct = katachiCorrectFirstTry/total;
+  let stars = 1;
+  if(pct >= 0.9) stars = 3;
+  else if(pct >= 0.6) stars = 2;
+  katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
+  saveKatachiProgress();
+  recordStat('katachi', 'SESSION', true);
+  checkAndUnlockBadges();
+  showKatachiResult(stars);
+}
+
+/* --- シーン探し（きいて／みほんと おなじ） --- */
+function buildKatachiSceneRounds(){
+  const rounds = [];
+  for(let i=0;i<10;i++){
+    const target = SHAPES[randInt(0,SHAPES.length-1)];
+    const targetCount = randInt(1,3);
+    const totalCount = randInt(8,10);
+    let items = [];
+    for(let t=0;t<targetCount;t++){
+      items.push({key:target.key, color:randomShapeColor(), size:randInt(38,58), id:'t'+i+'_'+t+'_'+Math.random().toString(36).slice(2)});
+    }
+    while(items.length < totalCount){
+      const other = SHAPES[randInt(0,SHAPES.length-1)];
+      if(other.key===target.key) continue;
+      items.push({key:other.key, color:randomShapeColor(), size:randInt(38,58), id:'d'+items.length+'_'+Math.random().toString(36).slice(2)});
+    }
+    rounds.push({target, targetCount, items: shuffle(items)});
+  }
+  return rounds;
+}
+function startKatachiScene(cueType){
+  currentKatachiKind = 'scene';
+  currentKatachiMode = cueType;
+  katachiSceneRounds = buildKatachiSceneRounds();
+  katachiRoundIdx = 0; katachiRoundsCorrectFirstTry = 0;
+  showScreen('screen-katachi-scene');
+  renderKatachiScene();
+}
+function renderKatachiScene(){
+  const total = katachiSceneRounds.length;
+  document.getElementById('katachi-scene-progress').textContent = `${katachiRoundIdx+1} / ${total}`;
+  document.getElementById('katachi-scene-bar').style.width = ((katachiRoundIdx+1)/total*100)+'%';
+  document.getElementById('katachi-scene-feedback').textContent = '';
+  document.getElementById('katachi-scene-feedback').className = 'feedback';
+
+  const round = katachiSceneRounds[katachiRoundIdx];
+  katachiFoundIds = new Set();
+  katachiRemainingTarget = round.targetCount;
+  katachiRoundHadWrong = false;
+
+  const instr = document.getElementById('katachi-scene-instruction');
+  if(currentKatachiMode==='audio'){
+    instr.innerHTML = `<button class="quiz-speaker-btn si-sample" onclick="speak('${round.target.name}')">🔊</button><p>「${round.target.name}」を ぜんぶ みつけてね</p><div class="scene-remaining" id="scene-remaining">のこり ${katachiRemainingTarget} こ</div>`;
+    setTimeout(()=>speak(round.target.name), 300);
+  } else {
+    instr.innerHTML = `<div class="si-sample shape-stage" style="min-height:60px;">${renderShapeDiv(round.target.key, 56, randomShapeColor())}</div><p>この かたちと おなじものを ぜんぶ みつけてね</p><div class="scene-remaining" id="scene-remaining">のこり ${katachiRemainingTarget} こ</div>`;
+    setTimeout(()=>speak(round.target.name), 300);
+  }
+
+  const field = document.getElementById('katachi-scene-field');
+  field.innerHTML = round.items.map(it=>
+    `<div class="scene-item" data-key="${it.key}" data-id="${it.id}" onclick="tapSceneItem(this)">${renderShapeDiv(it.key, it.size, it.color)}</div>`
+  ).join('');
+}
+function tapSceneItem(el){
+  const round = katachiSceneRounds[katachiRoundIdx];
+  const key = el.dataset.key, id = el.dataset.id;
+  if(key === round.target.key){
+    if(katachiFoundIds.has(id)) return;
+    katachiFoundIds.add(id);
+    el.classList.add('found');
+    katachiRemainingTarget--;
+    document.getElementById('scene-remaining').textContent = `のこり ${katachiRemainingTarget} こ`;
+    launchStamp('⭐');
+    if(katachiRemainingTarget <= 0){
+      const fb = document.getElementById('katachi-scene-feedback');
+      fb.textContent = 'ぜんぶ みつけた！ 🎉';
+      fb.className = 'feedback correct';
+      playCorrectChime();
+      recordStat('katachi', currentKatachiMode, !katachiRoundHadWrong);
+      if(!katachiRoundHadWrong) katachiRoundsCorrectFirstTry++;
+      setTimeout(()=>{
+        katachiRoundIdx++;
+        if(katachiRoundIdx < katachiSceneRounds.length) renderKatachiScene();
+        else finishKatachiScene();
+      }, 1000);
+    }
+  } else {
+    katachiRoundHadWrong = true;
+    el.classList.add('wrong-flash');
+    playWrongBuzz();
+    setTimeout(()=>el.classList.remove('wrong-flash'), 400);
+  }
+}
+function finishKatachiScene(){
+  const total = katachiSceneRounds.length;
+  const pct = katachiRoundsCorrectFirstTry/total;
+  let stars = 1;
+  if(pct >= 0.9) stars = 3;
+  else if(pct >= 0.6) stars = 2;
+  katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
+  saveKatachiProgress();
+  recordStat('katachi', 'SESSION', true);
+  checkAndUnlockBadges();
+  showKatachiResult(stars);
+}
+function retryKatachi(){
+  if(currentKatachiKind==='basic') startKatachiBasic(currentKatachiMode);
+  else startKatachiScene(currentKatachiMode);
+}
+function showKatachiResult(stars){
+  showScreen('screen-katachi-result');
+  const ranks = [
+    {min:3, emoji:'🏆', title:'かんぺき！'},
+    {min:2, emoji:'🎉', title:'よくできました！'},
+    {min:1, emoji:'💪', title:'もう すこし！'},
+  ];
+  const rank = ranks.find(r=>stars>=r.min) || ranks[ranks.length-1];
+  document.getElementById('katachi-result-emoji').textContent = rank.emoji;
+  document.getElementById('katachi-result-title').textContent = rank.title;
+  document.getElementById('katachi-result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(stars>=2){ launchStamp('🎊'); launchStamp('✨'); }
+}
+
+/* ================= オープニング スプラッシュ ================= */
+function initSplash(){
+  const bubbles = document.getElementById('splash-bubbles');
+  const emojis = ['🌈','⭐','🎈','🍭','🐶','🍎','☁️','✨','🎀','🐥','🧸','🍊'];
+  let html = '';
+  for(let i=0;i<14;i++){
+    const e = emojis[Math.floor(Math.random()*emojis.length)];
+    const left = Math.floor(Math.random()*100);
+    const size = 20 + Math.floor(Math.random()*20);
+    const dur = (6 + Math.random()*5).toFixed(1);
+    const delay = (Math.random()*6).toFixed(1);
+    html += `<div class="splash-bubble" style="left:${left}%;bottom:-60px;width:${size}px;height:${size}px;font-size:${Math.round(size*0.7)}px;animation-duration:${dur}s;animation-delay:${delay}s;">${e}</div>`;
+  }
+  bubbles.innerHTML = html;
+
+  let count = 3;
+  const numEl = document.getElementById('splash-count-num');
+  const timer = setInterval(()=>{
+    count--;
+    if(count <= 0){ clearInterval(timer); skipSplash(); return; }
+    numEl.textContent = count;
+    numEl.style.animation = 'none';
+    void numEl.offsetWidth;
+    numEl.style.animation = 'splashCountPop .4s ease-out';
+  }, 1000);
+  window._splashTimer = timer;
+}
+let splashDismissed = false;
+function skipSplash(){
+  if(splashDismissed) return;
+  splashDismissed = true;
+  if(window._splashTimer) clearInterval(window._splashTimer);
+  const el = document.getElementById('screen-splash');
+  el.classList.add('fade-out');
+  setTimeout(()=>{ el.style.display = 'none'; }, 420);
+}
+initSplash();
+
+/* 起動時に バッジ・しょうごう じょうきょうを 読みこみ */
+(async function initBadgesOnLoad(){
+  try{
+    const {unlocked} = await loadBadgeContext();
+    badgesUnlockedCache = unlocked;
+    updateCurrentTitleSlot();
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
