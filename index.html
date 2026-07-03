@@ -35,6 +35,7 @@ p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
 .subject-grid .subject-btn:nth-child(3){animation-delay:.25s;}
 .subject-grid .subject-btn:nth-child(4){animation-delay:.35s;}
 .subject-grid .subject-btn:nth-child(5){animation-delay:.45s;}
+.subject-grid .subject-btn:nth-child(6){animation-delay:.55s;}
 @keyframes idleBounce{0%,100%{transform:translateY(0) rotate(0);}50%{transform:translateY(-8px) rotate(-4deg);}}
 @keyframes subjectPop{0%{transform:scale(0) rotate(-8deg);opacity:0;}60%{transform:scale(1.08) rotate(3deg);opacity:1;}100%{transform:scale(1) rotate(0);opacity:1;}}
 .subject-btn:active{transform:scale(.96);}
@@ -237,6 +238,15 @@ p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
 .stat-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#6EC6FF,#4CAF82);transition:width .4s;}
 .stat-empty{text-align:center;color:#B0BCCB;font-size:13px;padding:20px;}
 
+/* --- アルファベット --- */
+.alpha-table-flip-wrap{perspective:900px;margin-bottom:10px;}
+.alpha-table{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;transition:transform .18s ease;transform-style:preserve-3d;}
+.alpha-table.flipping{transform:rotateY(90deg);}
+.alpha-cell{aspect-ratio:1;border-radius:12px;border:2px solid #D0E4F5;background:#F5FAFF;font-weight:900;color:#2B2250;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;}
+.alpha-cell:active{transform:scale(.9);background:#E8FFF4;border-color:#4CAF82;}
+.alpha-cell .ac-single{font-size:24px;}
+.alpha-letter-big{font-size:80px;font-weight:900;color:#fff;line-height:1;}
+
 #stamp-container{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden;}
 .stamp{position:absolute;font-size:44px;animation:stampFly 1s ease-out forwards;}
 @keyframes stampFly{0%{transform:translateY(0) scale(.4) rotate(0);opacity:1;}60%{transform:translateY(-140px) scale(1.3) rotate(15deg);opacity:1;}100%{transform:translateY(-220px) scale(1) rotate(-10deg);opacity:0;}}
@@ -311,6 +321,9 @@ p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
         </button>
         <button class="subject-btn b-blue" style="background:linear-gradient(135deg,#B06EF5,#7C3AED);" onclick="openKatachi()">
           <span class="sb-emoji">🔺</span><span class="sb-label">かたち</span>
+        </button>
+        <button class="subject-btn b-coral" style="background:linear-gradient(135deg,#4ECDC4,#2A9D8F);" onclick="openAlpha()">
+          <span class="sb-emoji">Aa</span><span class="sb-label">アルファベット</span>
         </button>
       </div>
     </div>
@@ -577,6 +590,66 @@ p.sub{text-align:center;color:#7A8AA8;font-size:13px;margin-bottom:16px;}
       </div>
     </div>
 
+    <!-- アルファベット ホーム -->
+    <div id="screen-alpha-home">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-subject')">←</button>
+        <div class="topbar-title">アルファベット</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="mode-card b-blue" onclick="openAlphaTable()">
+        <div class="mode-icon">📋</div>
+        <div><h3>ひょうを みる</h3><p>タップすると おとが きこえるよ</p></div>
+      </button>
+      <button class="mode-card" style="background:linear-gradient(135deg,#6EC6FF,#2E8FCC);" onclick="startAlphaQuiz('visual')">
+        <div class="mode-icon">👀</div>
+        <div><h3>みて こたえる</h3><p>おおもじ⇔こもじ の ペアを えらぼう<span class="mode-substars" id="alpha-stars-visual"></span></p></div>
+      </button>
+      <button class="mode-card" style="background:linear-gradient(135deg,#FF9A8B,#FF6F61);" onclick="startAlphaQuiz('audio')">
+        <div class="mode-icon">👂</div>
+        <div><h3>きいて こたえる</h3><p>おとを きいて もじを タップ<span class="mode-substars" id="alpha-stars-audio"></span></p></div>
+      </button>
+      <button class="big-btn b-ghost" onclick="resetAlphaProgress()">きろくを けす</button>
+    </div>
+
+    <!-- アルファベット ひょう -->
+    <div id="screen-alpha-table">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-alpha-home')">←</button>
+        <div class="topbar-title">A〜Z の ひょう</div>
+        <div style="width:40px;"></div>
+      </div>
+      <button class="big-btn b-blue" id="alpha-case-toggle" onclick="toggleAlphaCase()">🔄 いま：おおもじ</button>
+      <div class="alpha-table-flip-wrap">
+        <div class="alpha-table" id="alpha-table"></div>
+      </div>
+      <div class="table-word-box empty-state" id="alpha-word-box">もじを タップしてみてね</div>
+    </div>
+
+    <!-- アルファベット クイズ -->
+    <div id="screen-alpha-quiz">
+      <div class="topbar">
+        <button class="icon-btn" onclick="showScreen('screen-alpha-home')">←</button>
+        <div class="topbar-title" id="alpha-quiz-progress"></div>
+        <div style="width:40px;"></div>
+      </div>
+      <div class="progress-bar-bg"><div class="progress-bar" id="alpha-quiz-bar" style="width:0%"></div></div>
+      <div class="quiz-question" id="alpha-quiz-question"></div>
+      <div class="opt-grid" id="alpha-quiz-opts"></div>
+      <div class="feedback" id="alpha-quiz-feedback"></div>
+    </div>
+
+    <!-- アルファベット結果 -->
+    <div id="screen-alpha-result">
+      <div class="result-wrap">
+        <div class="result-emoji" id="alpha-result-emoji">🌟</div>
+        <div class="result-title" id="alpha-result-title">よくできました！</div>
+        <div class="stars-row" id="alpha-result-stars"></div>
+        <button class="big-btn b-green" onclick="showScreen('screen-alpha-home')">もどる</button>
+        <button class="big-btn b-blue" onclick="startAlphaQuiz(currentAlphaMode)">もういちど</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -826,6 +899,13 @@ Object.keys(KATACHI_MODE_LABEL).forEach(mode=>{
   BADGE_DEFS.push({id:'katachi_'+mode+'_master', name:label+' ★3', desc:'かたち「'+label+'」で ★3を たっせい', emoji:'🌟', rarity:'rare', check:(d)=> (d.katachi[mode]||0) >= 3});
 });
 BADGE_DEFS.push({id:'katachi_title', name:'かたちはかせ', desc:'かたちの ぜんモードで ★3', emoji:'🏆', rarity:'title', check:(d)=> Object.keys(KATACHI_MODE_LABEL).every(m=>(d.katachi[m]||0)>=3)});
+const ALPHA_MODE_LABEL = {visual:'みてこたえる', audio:'きいてこたえる'};
+Object.keys(ALPHA_MODE_LABEL).forEach(mode=>{
+  const label = ALPHA_MODE_LABEL[mode];
+  BADGE_DEFS.push({id:'alphabet_'+mode+'_clear', name:'ABC '+label+' クリア', desc:'アルファベット「'+label+'」を クリア', emoji:'🔤', rarity:'common', check:(d)=> (d.alphabet[mode]||0) >= 1});
+  BADGE_DEFS.push({id:'alphabet_'+mode+'_master', name:'ABC '+label+' ★3', desc:'アルファベット「'+label+'」で ★3を たっせい', emoji:'🌟', rarity:'rare', check:(d)=> (d.alphabet[mode]||0) >= 3});
+});
+BADGE_DEFS.push({id:'alphabet_title', name:'アルファベットはかせ', desc:'アルファベットの ぜんモードで ★3', emoji:'🏆', rarity:'title', check:(d)=> Object.keys(ALPHA_MODE_LABEL).every(m=>(d.alphabet[m]||0)>=3)});
 [[10,'🥉','common'],[30,'🥈','common'],[100,'🥇','rare'],[200,'💎','rare'],[500,'👑','epic']].forEach(([n,emoji,rarity])=>{
   BADGE_DEFS.push({id:'correct_'+n, name:'せいかい '+n+'かい', desc:'ぜんたいで '+n+'もん せいかいする', emoji, rarity, check:(d)=> d.agg.totalCorrect >= n});
 });
@@ -838,9 +918,10 @@ BADGE_DEFS.push({id:'katachi_title', name:'かたちはかせ', desc:'かたち�
 [[3,'common'],[7,'common'],[14,'rare']].forEach(([n,rarity])=>{
   BADGE_DEFS.push({id:'days_'+n, name:n+'にち あそんだ', desc:n+'にちいじょう れんしゅうする', emoji:'📅', rarity, check:(d)=> d.agg.daysPlayed >= n});
 });
-BADGE_DEFS.push({id:'allrounder', name:'オールラウンダー', desc:'5つの きょうかを ぜんぶ 1かい いじょう クリア', emoji:'🌈', rarity:'epic', check:(d)=>
+BADGE_DEFS.push({id:'allrounder', name:'オールラウンダー', desc:'6つの きょうかを ぜんぶ 1かい いじょう クリア', emoji:'🌈', rarity:'epic', check:(d)=>
   (d.hiragana['level1_clears']||0)>=1 && (d.katakana['level1_clears']||0)>=1 &&
-  Object.values(d.iro).some(v=>v>=1) && Object.values(d.kazu).some(v=>v>=1) && Object.values(d.katachi).some(v=>v>=1)
+  Object.values(d.iro).some(v=>v>=1) && Object.values(d.kazu).some(v=>v>=1) && Object.values(d.katachi).some(v=>v>=1) &&
+  Object.values(d.alphabet).some(v=>v>=1)
 });
 BADGE_DEFS.push({id:'grand_champion', name:'パーフェクトチャンピオン', desc:'ぜんぶの バッジを あつめる', emoji:'👑', rarity:'title', check:null});
 
@@ -858,18 +939,19 @@ function computeAggregates(stats){
 let badgesUnlockedCache = {};
 async function loadBadgeContext(){
   const parseR = (r)=>{ try{ return (r && r.value) ? JSON.parse(r.value) : {}; }catch(e){ return {}; } };
-  const [h,k,i,z,t,s,u] = await Promise.all([
+  const [h,k,i,z,t,a,s,u] = await Promise.all([
     window.storage.get('hiragana-progress-v2').catch(()=>null),
     window.storage.get('katakana-progress-v2').catch(()=>null),
     window.storage.get('iro-progress-v1').catch(()=>null),
     window.storage.get('kazu-progress-v1').catch(()=>null),
     window.storage.get('katachi-progress-v1').catch(()=>null),
+    window.storage.get('alphabet-progress-v1').catch(()=>null),
     window.storage.get('stats-log-v1').catch(()=>null),
     window.storage.get('badges-unlocked-v1').catch(()=>null),
   ]);
   let statsArr = [];
   try{ statsArr = (s && s.value) ? JSON.parse(s.value) : []; }catch(e){ statsArr = []; }
-  const d = {hiragana:parseR(h), katakana:parseR(k), iro:parseR(i), kazu:parseR(z), katachi:parseR(t)};
+  const d = {hiragana:parseR(h), katakana:parseR(k), iro:parseR(i), kazu:parseR(z), katachi:parseR(t), alphabet:parseR(a)};
   d.agg = computeAggregates(statsArr);
   let unlocked = {};
   try{ unlocked = (u && u.value) ? JSON.parse(u.value) : {}; }catch(e){ unlocked = {}; }
@@ -1030,13 +1112,14 @@ function updateCurrentTitleSlot(){
 }
 
 /* ================= きろく（とうけい）画面 ================= */
-const STATS_SUBJECT_LABEL = {'kana-hiragana':'ひらがな','kana-katakana':'カタカナ','iro':'いろ','kazu':'かず','katachi':'かたち'};
+const STATS_SUBJECT_LABEL = {'kana-hiragana':'ひらがな','kana-katakana':'カタカナ','iro':'いろ','kazu':'かず','katachi':'かたち','alphabet':'アルファベット'};
 const STATS_MODE_LABEL = {
   'kana-hiragana': {level1:'レベル1（1もじ）', level2:'レベル2（2〜3もじ）', level3:'レベル3（4もじ〜）'},
   'kana-katakana': {level1:'レベル1（1もじ）', level2:'レベル2（2〜3もじ）', level3:'レベル3（4もじ〜）'},
   'iro': {color2name:'いろ→なまえ', name2color:'なまえ→いろ'},
   'kazu': {read:'きいてすうじ', count:'かぞえる', add:'たしざん'},
   'katachi': {visual2name:'みてなまえ', name2visual:'きいてかたち', audio:'きいてさがす', visual:'みほんさがし'},
+  'alphabet': {visual:'みてこたえる', audio:'きいてこたえる'},
 };
 async function openStats(){
   try{ await ensureStatsLoaded(); }catch(e){}
@@ -1896,6 +1979,187 @@ function showKatachiResult(stars){
   document.getElementById('katachi-result-emoji').textContent = rank.emoji;
   document.getElementById('katachi-result-title').textContent = rank.title;
   document.getElementById('katachi-result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  if(stars>=2){ launchStamp('🎊'); launchStamp('✨'); }
+}
+
+/* ================= アルファベット ================= */
+const ALPHA_WORD_MAP = {
+  A:{w:'Apple',e:'🍎'}, B:{w:'Ball',e:'⚽'}, C:{w:'Cat',e:'🐱'}, D:{w:'Dog',e:'🐶'}, E:{w:'Elephant',e:'🐘'},
+  F:{w:'Fish',e:'🐟'}, G:{w:'Grapes',e:'🍇'}, H:{w:'Hat',e:'🎩'}, I:{w:'Ice Cream',e:'🍦'}, J:{w:'Juice',e:'🧃'},
+  K:{w:'Kite',e:'🪁'}, L:{w:'Lion',e:'🦁'}, M:{w:'Moon',e:'🌙'}, N:{w:'Nest',e:'🪺'}, O:{w:'Orange',e:'🍊'},
+  P:{w:'Pig',e:'🐷'}, Q:{w:'Queen',e:'👸'}, R:{w:'Rainbow',e:'🌈'}, S:{w:'Sun',e:'☀️'}, T:{w:'Tiger',e:'🐯'},
+  U:{w:'Umbrella',e:'☂️'}, V:{w:'Violin',e:'🎻'}, W:{w:'Watermelon',e:'🍉'}, X:{w:'X-ray',e:'🩻'}, Y:{w:'Yo-yo',e:'🪀'}, Z:{w:'Zebra',e:'🦓'}
+};
+const ALPHABET_LETTERS = Object.keys(ALPHA_WORD_MAP);
+
+function speakEN(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  u.pitch = 1.15;
+  u.volume = 1;
+  window.speechSynthesis.speak(u);
+}
+
+let currentAlphaMode = null;
+let alphaQuizList = [], alphaIdx = 0, alphaCorrectFirstTry = 0, alphaWaiting = false;
+let alphaProgress = {};
+
+async function loadAlphaProgress(){
+  try{
+    const r = await window.storage.get('alphabet-progress-v1');
+    alphaProgress = (r && r.value) ? JSON.parse(r.value) : {};
+  }catch(e){ alphaProgress = {}; }
+}
+async function saveAlphaProgress(){
+  try{ await window.storage.set('alphabet-progress-v1', JSON.stringify(alphaProgress)); }catch(e){}
+}
+async function resetAlphaProgress(){
+  alphaProgress = {};
+  await saveAlphaProgress();
+  renderAlphaHome();
+}
+async function openAlpha(){
+  await loadAlphaProgress();
+  renderAlphaHome();
+  showScreen('screen-alpha-home');
+}
+function renderAlphaHome(){
+  ['visual','audio'].forEach(m=>{
+    const s = alphaProgress[m] || 0;
+    document.getElementById('alpha-stars-'+m).textContent = s>0 ? '　⭐'.repeat(s) : '';
+  });
+}
+
+/* --- ひょう --- */
+let alphaTableCase = 'upper';
+function openAlphaTable(){
+  showScreen('screen-alpha-table');
+  alphaTableCase = 'upper';
+  renderAlphaTable();
+}
+function renderAlphaTable(){
+  const grid = document.getElementById('alpha-table');
+  const isUpper = alphaTableCase === 'upper';
+  grid.innerHTML = ALPHABET_LETTERS.map(L=>{
+    const display = isUpper ? L : L.toLowerCase();
+    return `<div class="alpha-cell" onclick="tapAlphaChar('${L}','${isUpper?'upper':'lower'}')"><span class="ac-single">${display}</span></div>`;
+  }).join('');
+  document.getElementById('alpha-case-toggle').textContent = isUpper ? '🔄 いま：おおもじ（タップで こもじへ）' : '🔄 いま：こもじ（タップで おおもじへ）';
+  const box = document.getElementById('alpha-word-box');
+  box.className = 'table-word-box empty-state';
+  box.textContent = 'もじを タップしてみてね';
+}
+function toggleAlphaCase(){
+  const grid = document.getElementById('alpha-table');
+  grid.classList.add('flipping');
+  setTimeout(()=>{
+    alphaTableCase = (alphaTableCase === 'upper') ? 'lower' : 'upper';
+    renderAlphaTable();
+    grid.classList.remove('flipping');
+  }, 180);
+}
+function tapAlphaChar(L, caseType){
+  speakEN(L);
+  const info = ALPHA_WORD_MAP[L];
+  const displayChar = caseType==='lower' ? L.toLowerCase() : L;
+  const box = document.getElementById('alpha-word-box');
+  box.className = 'table-word-box';
+  box.innerHTML = `<div class="tw-emoji">${info.e}</div><div class="tw-text"><div class="tw-char">${displayChar}</div><div class="tw-word">${info.w}</div></div>`;
+}
+
+/* --- クイズ --- */
+function startAlphaQuiz(mode){
+  currentAlphaMode = mode;
+  alphaQuizList = shuffle(ALPHABET_LETTERS.slice()).slice(0, 10);
+  alphaIdx = 0; alphaCorrectFirstTry = 0;
+  showScreen('screen-alpha-quiz');
+  renderAlphaQuiz();
+}
+function renderAlphaQuiz(){
+  alphaWaiting = false;
+  const total = alphaQuizList.length;
+  document.getElementById('alpha-quiz-progress').textContent = `${alphaIdx+1} / ${total}`;
+  document.getElementById('alpha-quiz-bar').style.width = ((alphaIdx+1)/total*100)+'%';
+  document.getElementById('alpha-quiz-feedback').textContent = '';
+  document.getElementById('alpha-quiz-feedback').className = 'feedback';
+
+  const L = alphaQuizList[alphaIdx];
+  const qbox = document.getElementById('alpha-quiz-question');
+  const grid = document.getElementById('alpha-quiz-opts');
+  const distractors = shuffle(ALPHABET_LETTERS.filter(x=>x!==L)).slice(0,3);
+
+  if(currentAlphaMode==='visual'){
+    // おおもじ⇔こもじ の ペアを えらぶ
+    const showUpper = Math.random() < 0.5;
+    const questionChar = showUpper ? L : L.toLowerCase();
+    const answerChar = showUpper ? L.toLowerCase() : L;
+    qbox.innerHTML = `<div class="alpha-letter-big">${questionChar}</div><p class="iro-question-text">おなじ もじは どれかな？</p>`;
+    const opts = shuffle([answerChar, ...distractors.map(d=> showUpper ? d.toLowerCase() : d)]);
+    grid.innerHTML = opts.map(o=>`<button class="opt-btn" data-val="${o}" onclick="answerAlpha('${o}', this, '${answerChar}')">${o}</button>`).join('');
+  } else {
+    qbox.innerHTML = `<button class="quiz-speaker-btn" onclick="speakEN('${L}')">🔊</button><p class="iro-question-text">きこえた もじは どれかな？</p>`;
+    setTimeout(()=>speakEN(L), 250);
+    const opts = shuffle([L, ...distractors]);
+    grid.innerHTML = opts.map(o=>`<button class="opt-btn" data-val="${o}" onclick="answerAlpha('${o}', this, '${L}')">${o}</button>`).join('');
+  }
+}
+function answerAlpha(chosen, el, correct){
+  if(alphaWaiting) return;
+  alphaWaiting = true;
+  const fb = document.getElementById('alpha-quiz-feedback');
+  const grid = document.getElementById('alpha-quiz-opts');
+  const isCorrect = chosen === correct;
+  recordStat('alphabet', currentAlphaMode, isCorrect);
+  if(isCorrect){
+    el.classList.add('correct');
+    fb.textContent = 'せいかい！ 🎉';
+    fb.className = 'feedback correct';
+    launchStamp('🌟');
+    playCorrectChime();
+    alphaCorrectFirstTry++;
+  } else {
+    el.classList.add('wrong');
+    grid.querySelectorAll('[data-val]').forEach(o=>{ if(o.dataset.val===correct) o.classList.add('correct'); });
+    fb.textContent = 'おしい！ せいかいは 「'+correct+'」';
+    fb.className = 'feedback wrong';
+    playWrongBuzz();
+  }
+  setTimeout(()=>{
+    alphaIdx++;
+    if(alphaIdx < alphaQuizList.length) renderAlphaQuiz();
+    else finishAlphaQuiz();
+  }, 1100);
+}
+async function finishAlphaQuiz(){
+  const total = alphaQuizList.length;
+  const pct = alphaCorrectFirstTry/total;
+  let stars = 1;
+  if(pct >= 0.9) stars = 3;
+  else if(pct >= 0.6) stars = 2;
+  alphaProgress[currentAlphaMode] = Math.max(alphaProgress[currentAlphaMode]||0, stars);
+  try{
+    await withTimeout((async()=>{
+      await saveAlphaProgress();
+      await recordStat('alphabet', 'SESSION', true);
+      await checkAndUnlockBadges();
+    })(), 3000);
+  }catch(e){ console.error('進捗保存/バッジ判定でエラー:', e); }
+  showAlphaResult(stars);
+}
+function showAlphaResult(stars){
+  showScreen('screen-alpha-result');
+  const ranks = [
+    {min:3, emoji:'🏆', title:'かんぺき！'},
+    {min:2, emoji:'🎉', title:'よくできました！'},
+    {min:1, emoji:'💪', title:'もう すこし！'},
+  ];
+  const rank = ranks.find(r=>stars>=r.min) || ranks[ranks.length-1];
+  document.getElementById('alpha-result-emoji').textContent = rank.emoji;
+  document.getElementById('alpha-result-title').textContent = rank.title;
+  document.getElementById('alpha-result-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
   if(stars>=2){ launchStamp('🎊'); launchStamp('✨'); }
 }
 
