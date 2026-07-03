@@ -1205,7 +1205,7 @@ function answerQuiz(chosen, btn){
     else finishQuiz();
   }, 1100);
 }
-function finishQuiz(){
+async function finishQuiz(){
   const total = quizList.length;
   const correctCount = quizCorrectFirstTry;
   const pct = correctCount/total;
@@ -1214,9 +1214,9 @@ function finishQuiz(){
   if(cleared){
     progress[key] = Math.min((progress[key]||0) + 1, 10);
   }
-  saveProgress();
-  recordStat('kana-'+currentKind, 'SESSION', cleared);
-  checkAndUnlockBadges();
+  await saveProgress();
+  await recordStat('kana-'+currentKind, 'SESSION', cleared);
+  await checkAndUnlockBadges();
   showResult(pct, cleared);
 }
 
@@ -1363,16 +1363,16 @@ function answerIro(chosen, el){
   }, 1100);
 }
 
-function finishIroQuiz(){
+async function finishIroQuiz(){
   const total = iroQuizList.length;
   const pct = iroCorrectFirstTry/total;
   let stars = 1;
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   iroProgress[currentIroMode] = Math.max(iroProgress[currentIroMode]||0, stars);
-  saveIroProgress();
-  recordStat('iro', 'SESSION', true);
-  checkAndUnlockBadges();
+  await saveIroProgress();
+  await recordStat('iro', 'SESSION', true);
+  await checkAndUnlockBadges();
   showIroResult(stars);
 }
 
@@ -1550,16 +1550,16 @@ function answerKazu(chosen, el, correct){
   }, 1100);
 }
 
-function finishKazuQuiz(){
+async function finishKazuQuiz(){
   const total = kazuQuizList.length;
   const pct = kazuCorrectFirstTry/total;
   let stars = 1;
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   kazuProgress[currentKazuMode] = Math.max(kazuProgress[currentKazuMode]||0, stars);
-  saveKazuProgress();
-  recordStat('kazu', 'SESSION', true);
-  checkAndUnlockBadges();
+  await saveKazuProgress();
+  await recordStat('kazu', 'SESSION', true);
+  await checkAndUnlockBadges();
   showKazuResult(stars);
 }
 
@@ -1700,16 +1700,16 @@ function answerKatachiQuiz(chosen, el, correct){
     else finishKatachiBasic();
   }, 1100);
 }
-function finishKatachiBasic(){
+async function finishKatachiBasic(){
   const total = katachiQuizList.length;
   const pct = katachiCorrectFirstTry/total;
   let stars = 1;
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
-  saveKatachiProgress();
-  recordStat('katachi', 'SESSION', true);
-  checkAndUnlockBadges();
+  await saveKatachiProgress();
+  await recordStat('katachi', 'SESSION', true);
+  await checkAndUnlockBadges();
   showKatachiResult(stars);
 }
 
@@ -1797,16 +1797,16 @@ function tapSceneItem(el){
     setTimeout(()=>el.classList.remove('wrong-flash'), 400);
   }
 }
-function finishKatachiScene(){
+async function finishKatachiScene(){
   const total = katachiSceneRounds.length;
   const pct = katachiRoundsCorrectFirstTry/total;
   let stars = 1;
   if(pct >= 0.9) stars = 3;
   else if(pct >= 0.6) stars = 2;
   katachiProgress[currentKatachiMode] = Math.max(katachiProgress[currentKatachiMode]||0, stars);
-  saveKatachiProgress();
-  recordStat('katachi', 'SESSION', true);
-  checkAndUnlockBadges();
+  await saveKatachiProgress();
+  await recordStat('katachi', 'SESSION', true);
+  await checkAndUnlockBadges();
   showKatachiResult(stars);
 }
 function retryKatachi(){
