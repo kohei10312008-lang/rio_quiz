@@ -1409,6 +1409,11 @@ const COLORS = [
   {name:'ちゃいろ', hex:'#8B5E3C'},
   {name:'くろ', hex:'#2C2C2E'},
   {name:'しろ', hex:'#F4F4F6'},
+  {name:'みずいろ', hex:'#5AC8E8'},
+  {name:'はいいろ', hex:'#8E8E93'},
+  {name:'こんいろ', hex:'#1F3A5F'},
+  {name:'きみどり', hex:'#A8D33C'},
+  {name:'きんいろ', hex:'#E0B84C'},
 ];
 let currentIroMode = null;
 let iroQuizList = [], iroIdx = 0, iroCorrectFirstTry = 0, iroWaiting = false;
@@ -1442,7 +1447,7 @@ function renderIroHome(){
 
 function startIroQuiz(mode){
   currentIroMode = mode;
-  iroQuizList = shuffle(COLORS).slice(0, 8);
+  iroQuizList = shuffle(COLORS).slice(0, 10);
   iroIdx = 0; iroCorrectFirstTry = 0;
   showScreen('screen-iro-quiz');
   renderIroQuiz();
@@ -1781,11 +1786,7 @@ function renderKatachiHome(){
 
 /* --- 4択（見て／きいて） --- */
 function buildKatachiBasicList(){
-  let list = [];
-  for(let round=0; round<3; round++){
-    shuffle(SHAPES).forEach(s=> list.push({key:s.key, name:s.name}));
-  }
-  return list;
+  return shuffle(SHAPES).slice(0, 10).map(s=>({key:s.key, name:s.name}));
 }
 function startKatachiBasic(mode){
   currentKatachiKind = 'basic';
