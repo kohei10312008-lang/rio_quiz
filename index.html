@@ -814,7 +814,7 @@ function computeAggregates(stats){
 
 let badgesUnlockedCache = {};
 async function loadBadgeContext(){
-  const parseR = (r)=> (r && r.value) ? JSON.parse(r.value) : {};
+  const parseR = (r)=>{ try{ return (r && r.value) ? JSON.parse(r.value) : {}; }catch(e){ return {}; } };
   const [h,k,i,z,t,s,u] = await Promise.all([
     window.storage.get('hiragana-progress-v2').catch(()=>null),
     window.storage.get('katakana-progress-v2').catch(()=>null),
@@ -824,10 +824,12 @@ async function loadBadgeContext(){
     window.storage.get('stats-log-v1').catch(()=>null),
     window.storage.get('badges-unlocked-v1').catch(()=>null),
   ]);
-  const statsArr = (s && s.value) ? JSON.parse(s.value) : [];
+  let statsArr = [];
+  try{ statsArr = (s && s.value) ? JSON.parse(s.value) : []; }catch(e){ statsArr = []; }
   const d = {hiragana:parseR(h), katakana:parseR(k), iro:parseR(i), kazu:parseR(z), katachi:parseR(t)};
   d.agg = computeAggregates(statsArr);
-  const unlocked = (u && u.value) ? JSON.parse(u.value) : {};
+  let unlocked = {};
+  try{ unlocked = (u && u.value) ? JSON.parse(u.value) : {}; }catch(e){ unlocked = {}; }
   return {d, unlocked};
 }
 
@@ -901,9 +903,14 @@ async function saveBadgeViewed(){
   try{ await window.storage.set('badges-viewed-v1', JSON.stringify(badgesViewedCache)); }catch(e){}
 }
 async function openBadges(){
-  const {unlocked} = await loadBadgeContext();
-  badgesUnlockedCache = unlocked;
-  await loadBadgeViewed();
+  try{
+    const {unlocked} = await loadBadgeContext();
+    badgesUnlockedCache = unlocked;
+    await loadBadgeViewed();
+  }catch(e){
+    badgesUnlockedCache = badgesUnlockedCache || {};
+    badgesViewedCache = badgesViewedCache || {};
+  }
   badgeTab = 'all';
   renderBadgeList();
   showScreen('screen-badges');
@@ -980,7 +987,7 @@ const STATS_MODE_LABEL = {
   'katachi': {visual2name:'みてなまえ', name2visual:'きいてかたち', audio:'きいてさがす', visual:'みほんさがし'},
 };
 async function openStats(){
-  await ensureStatsLoaded();
+  try{ await ensureStatsLoaded(); }catch(e){}
   renderStats();
   showScreen('screen-stats');
 }
